@@ -1,0 +1,62 @@
+<svg width="1600" height="1100" viewBox="0 0 1600 1100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="1100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B0C0E"/>
+      <stop offset="1" stop-color="#171A1F"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="translate(910 520) rotate(90) scale(500 600)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF8000" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#FF8000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1100" rx="50" fill="url(#bg)"/>
+  <rect width="1600" height="1100" rx="50" fill="url(#glow)"/>
+  <g opacity="0.14" stroke="#FFFFFF">
+    <path d="M0 140H1600M0 280H1600M0 420H1600M0 560H1600M0 700H1600M0 840H1600M0 980H1600"/>
+    <path d="M140 0V1100M280 0V1100M420 0V1100M560 0V1100M700 0V1100M840 0V1100M980 0V1100M1120 0V1100M1260 0V1100M1400 0V1100"/>
+  </g>
+  <g stroke="#FF8000" stroke-width="4" stroke-opacity="0.7">
+    <path d="M445 388H650"/>
+    <path d="M949 388H1155"/>
+    <path d="M800 520V666"/>
+    <path d="M596 768H718"/>
+    <path d="M882 768H1004"/>
+  </g>
+  <g>
+    <rect x="150" y="278" width="295" height="220" rx="30" fill="#15181C" stroke="#FFFFFF" stroke-opacity="0.16"/>
+    <rect x="650" y="278" width="300" height="250" rx="30" fill="#15181C" stroke="#FF8000" stroke-opacity="0.65"/>
+    <rect x="1155" y="278" width="295" height="220" rx="30" fill="#15181C" stroke="#FFFFFF" stroke-opacity="0.16"/>
+    <rect x="450" y="666" width="295" height="220" rx="30" fill="#15181C" stroke="#FFFFFF" stroke-opacity="0.16"/>
+    <rect x="855" y="666" width="295" height="220" rx="30" fill="#15181C" stroke="#FFFFFF" stroke-opacity="0.16"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="185" y="333" fill="#FF8000" font-size="22" font-weight="700">CUSTOMERS</text>
+    <text x="185" y="384" fill="#8F94A0" font-size="21">customer_id  PK</text>
+    <text x="185" y="426" fill="#8F94A0" font-size="21">name</text>
+    <text x="185" y="468" fill="#8F94A0" font-size="21">phone</text>
+
+    <text x="690" y="333" fill="#FF8000" font-size="22" font-weight="700">TRANSACTIONS</text>
+    <text x="690" y="384" fill="#FFFFFF" font-size="21">transaction_id  PK</text>
+    <text x="690" y="426" fill="#8F94A0" font-size="21">customer_id  FK</text>
+    <text x="690" y="468" fill="#8F94A0" font-size="21">service_id  FK</text>
+
+    <text x="1190" y="333" fill="#FF8000" font-size="22" font-weight="700">SERVICES</text>
+    <text x="1190" y="384" fill="#8F94A0" font-size="21">service_id  PK</text>
+    <text x="1190" y="426" fill="#8F94A0" font-size="21">service_name</text>
+    <text x="1190" y="468" fill="#8F94A0" font-size="21">price</text>
+
+    <text x="485" y="721" fill="#FF8000" font-size="22" font-weight="700">USERS</text>
+    <text x="485" y="772" fill="#8F94A0" font-size="21">user_id  PK</text>
+    <text x="485" y="814" fill="#8F94A0" font-size="21">username</text>
+    <text x="485" y="856" fill="#8F94A0" font-size="21">role</text>
+
+    <text x="890" y="721" fill="#FF8000" font-size="22" font-weight="700">DETAILS</text>
+    <text x="890" y="772" fill="#8F94A0" font-size="21">detail_id  PK</text>
+    <text x="890" y="814" fill="#8F94A0" font-size="21">transaction_id  FK</text>
+    <text x="890" y="856" fill="#8F94A0" font-size="21">quantity</text>
+  </g>
+  <rect x="92" y="86" width="260" height="46" rx="23" fill="#FF8000"/>
+  <text x="122" y="116" fill="#0B0C0E" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="2">DUMMY DOCUMENTATION</text>
+  <text x="92" y="998" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700">MySQL Database</text>
+  <text x="92" y="1055" fill="#8F94A0" font-family="Arial, Helvetica, sans-serif" font-size="30">Relational design · CRUD · SQL queries</text>
+</svg>

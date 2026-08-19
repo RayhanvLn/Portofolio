@@ -1,0 +1,13 @@
+<svg width="1200" height="1000" viewBox="0 0 1200 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="1000" fill="#111316"/>
+<defs><radialGradient id="r"><stop stop-color="#FF9A32"/><stop offset=".45" stop-color="#FF6500"/><stop offset="1" stop-color="#351300"/></radialGradient></defs>
+<circle cx="600" cy="500" r="330" fill="url(#r)"/>
+<circle cx="600" cy="500" r="260" stroke="white" stroke-opacity=".15"/>
+<circle cx="600" cy="500" r="210" stroke="white" stroke-opacity=".08"/>
+<rect x="333" y="256" width="534" height="488" rx="38" fill="#0B0C0E" fill-opacity=".78" stroke="white" stroke-opacity=".16"/>
+<rect x="378" y="325" width="444" height="62" rx="10" fill="#171A1F"/>
+<rect x="378" y="415" width="208" height="236" rx="12" fill="#1A1D21"/>
+<rect x="610" y="415" width="212" height="108" rx="12" fill="#FF8000"/>
+<rect x="610" y="543" width="212" height="108" rx="12" fill="#1A1D21"/>
+<text x="64" y="80" fill="#8F94A0" font-family="monospace" font-size="22">PRODUCT / UI SYSTEM</text>
+</svg>
