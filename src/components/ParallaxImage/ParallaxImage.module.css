@@ -1,0 +1,15 @@
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  display: block;
+}
+.inner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -15%;
+  height: 130%;
+  display: block;
+  will-change: transform;
+}

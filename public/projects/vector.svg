@@ -1,9 +1,0 @@
-<svg width="1200" height="1000" viewBox="0 0 1200 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="1200" height="1000" fill="#090A0C"/>
-<g opacity=".38" stroke="#484D56"><path d="M0 180H1200"/><path d="M0 350H1200"/><path d="M0 520H1200"/><path d="M0 690H1200"/><path d="M200 0V1000"/><path d="M400 0V1000"/><path d="M600 0V1000"/><path d="M800 0V1000"/><path d="M1000 0V1000"/></g>
-<path d="M337 711L572 213H697L902 711H743L635 430L498 711H337Z" fill="#171A1F" stroke="#474B53"/>
-<path d="M593 213L705 213L821 490L694 584L593 213Z" fill="#FF8000"/>
-<circle cx="816" cy="465" r="115" fill="#FF8000" fill-opacity=".11"/>
-<text x="78" y="90" fill="#FF8000" font-family="monospace" font-size="22">VECTOR ZERO / IDENTITY</text>
-<text x="78" y="930" fill="#8F94A0" font-family="monospace" font-size="18">FORM FOLLOWS FORCE — 2025</text>
-</svg>

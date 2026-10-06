@@ -1,0 +1,37 @@
+.marquee {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.25rem, 3vh, 2rem) 0;
+  border-block: 1px solid var(--line);
+  color: var(--fg);
+}
+.track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+.group {
+  display: flex;
+  flex-shrink: 0;
+}
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  padding-right: clamp(1.5rem, 3vw, 3rem);
+  font-weight: 800;
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  font-size: clamp(1.75rem, 4vw, 4.5rem);
+  line-height: 1;
+  white-space: nowrap;
+}
+.sep {
+  width: 0.45em;
+  height: 0.45em;
+  background: var(--c-accent);
+  box-shadow: 0 0 0 1px var(--fg);
+  flex-shrink: 0;
+}

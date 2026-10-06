@@ -1,0 +1,89 @@
+/* Full-screen logo transition. Colours/sizes come from src/config/pageTransition.ts
+   (written onto the element as --transition-bg, --transition-logo-filter, --logo-w-*). */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050; /* above everything except the custom cursor */
+  overflow: hidden;
+  pointer-events: auto; /* blocks clicks while a transition runs */
+}
+.overlay[data-state='idle'] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.panel {
+  position: absolute;
+  /* 2px bleed top/bottom: no hairline gaps while moving; dvh covers mobile URL-bar changes */
+  inset: -2px 0;
+  min-height: calc(100dvh + 4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--transition-bg);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.logoWrap {
+  display: block;
+  line-height: 0;
+  /* colour adjustment lives on the wrapper so the logo's own blur animation never overrides it */
+  filter: var(--transition-logo-filter, none);
+}
+
+.logo {
+  display: block;
+  width: var(--logo-w-mobile);
+  max-width: none;
+  height: auto;
+  opacity: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+@media (min-width: 640px) {
+  .logo {
+    width: var(--logo-w-tablet);
+  }
+}
+@media (min-width: 1024px) {
+  .logo {
+    width: var(--logo-w-desktop);
+  }
+}
+
+/* ── Page load: the logo assembles with pure CSS ──────────────────────
+   Runs from the very first paint (no waiting for JavaScript). The server
+   renders the overlay with data-state="covering"; navigations use
+   data-state="active", so this only ever plays on load. */
+.overlay[data-state='covering'] .logo {
+  animation: logoIntro var(--intro-duration, 520ms) var(--intro-ease, ease-out) var(--intro-delay, 80ms) both;
+}
+/* Reloads / later visits in the same session: shorter (html[data-preloaded] is set before paint). */
+:global(html[data-preloaded='true']) .overlay[data-state='covering'] .logo {
+  animation-duration: var(--intro-repeat-duration, 360ms);
+  animation-delay: var(--intro-repeat-delay, 40ms);
+}
+@keyframes logoIntro {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0) scale(0.85);
+    filter: blur(var(--intro-blur, 8px));
+    clip-path: polygon(0% 100%, 0% 100%, 0% 100%);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0px);
+    clip-path: polygon(0% 100%, 0% -120%, 220% 100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .overlay[data-state='covering'] .logo {
+    animation: none;
+    opacity: 1;
+  }
+}

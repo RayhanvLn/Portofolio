@@ -1,0 +1,121 @@
+/*
+ * Three independent fixed layers, each a direct child of <body>.
+ * The ring and dot use mix-blend-mode: difference with pure white, so they
+ * always show the NEGATIVE of whatever is underneath (white → black,
+ * black → white, orange → blue). They must NOT sit inside a wrapper with
+ * position + z-index, or the blend would be isolated from the page.
+ * The labelled bubble ("View", "Open"…) is a normal layer so it stays legible.
+ */
+.ring,
+.dot,
+.bubble {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  will-change: transform;
+}
+.ring[data-visible='true'],
+.dot[data-visible='true'],
+.bubble[data-visible='true'] {
+  opacity: 1;
+}
+.ring,
+.dot {
+  mix-blend-mode: difference;
+}
+
+.ringShape {
+  --s: 1;
+  position: absolute;
+  left: -20px;
+  top: -20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  transform: scale(var(--s));
+  transition:
+    transform 0.55s var(--ease-out),
+    background-color 0.35s ease,
+    opacity 0.3s ease;
+}
+.dotShape {
+  position: absolute;
+  left: -3.5px;
+  top: -3.5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.35s var(--ease-out);
+}
+
+/* Link / button: ring grows into a solid negative disc. */
+.ring[data-state='link'] .ringShape {
+  --s: 1.6;
+  background: #fff;
+}
+.dot[data-state='link'] .dotShape {
+  transform: scale(0);
+}
+
+/* Labelled states hand over to the bubble. */
+.ring[data-labelled='true'] .ringShape {
+  --s: 0.4;
+  opacity: 0;
+}
+.dot[data-labelled='true'] .dotShape {
+  transform: scale(0);
+}
+
+.ring[data-pressed='true'] .ringShape {
+  transform: scale(calc(var(--s) * 0.8));
+}
+
+/* Bubble */
+.bubbleShape {
+  position: absolute;
+  left: -50px;
+  top: -50px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  transform: scale(0);
+  transition: transform 0.55s var(--ease-out);
+}
+.bubble[data-labelled='true'] .bubbleShape {
+  transform: scale(1);
+}
+.bubble[data-state='open'] .bubbleShape {
+  transform: scale(1.45);
+}
+.bubble[data-state='drag'] .bubbleShape {
+  transform: scale(0.9);
+}
+.bubble[data-pressed='true'] .bubbleShape {
+  transform: scale(0.85);
+}
+.label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%) scale(0.6);
+  color: var(--c-dark);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  opacity: 0;
+  transition:
+    opacity 0.25s ease,
+    transform 0.45s var(--ease-out);
+}
+.bubble[data-labelled='true'] .label {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}

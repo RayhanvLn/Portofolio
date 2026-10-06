@@ -1,0 +1,32 @@
+.root {
+  display: block;
+}
+.visual {
+  display: block;
+}
+.line {
+  display: block;
+}
+.lineMask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+.lineInner {
+  display: block;
+  will-change: transform;
+}
+.word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  /* room for accents and descenders inside the mask */
+  padding: 0.08em 0.02em 0.1em;
+  margin: -0.08em -0.02em -0.1em;
+}
+.wordInner,
+.char {
+  display: inline-block;
+  will-change: transform;
+}

@@ -1,0 +1,15 @@
+/* Dark card holding the project index. It overlaps the light header with
+   rounded top corners; local colours keep it dark-themed at all times. */
+.list {
+  --fg: var(--c-paper);
+  --muted: #8d8d88;
+  --line: rgba(241, 240, 233, 0.16);
+  --card-r: 1.75rem;
+  position: relative;
+  z-index: 1;
+  margin-top: calc(-1 * var(--card-r));
+  padding: clamp(2.5rem, 7vh, 4.5rem) var(--gutter) clamp(5rem, 14vh, 10rem);
+  border-radius: var(--card-r) var(--card-r) 0 0;
+  background: var(--c-dark);
+  color: var(--fg);
+}

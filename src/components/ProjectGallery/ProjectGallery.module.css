@@ -1,0 +1,202 @@
+/* ── Case-study gallery: framed cards with a caption notch, two staggered columns ── */
+.gallery {
+  /* outline colour follows the scene; accent on hover */
+  --frame-line: var(--line);
+  --frame-line: color-mix(in srgb, var(--fg) 26%, transparent);
+  --frame-fill: color-mix(in srgb, var(--fg) 2.5%, transparent);
+  --card-gap: clamp(1rem, 2vw, 2rem);
+  --stagger: clamp(4rem, 13vw, 15rem); /* how far the second column starts lower */
+  padding: clamp(5rem, 12vh, 8rem) var(--gutter) clamp(6rem, 15vh, 10rem);
+}
+
+/* meta row + rule (same system as the other page headers) */
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 0.9rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.metaLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--fg);
+}
+.metaMark {
+  width: 0.55rem;
+  height: 0.55rem;
+  background: var(--c-accent);
+}
+.rule {
+  display: block;
+  height: 1px;
+  background: var(--line);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--card-gap);
+  align-items: start;
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+  will-change: transform;
+}
+.column[data-column='1'] {
+  padding-top: var(--stagger);
+}
+
+/* ── Card ─────────────────────────────────────────────────────────── */
+.card {
+  --pad: clamp(1.1rem, 2.6vw, 2.75rem);
+  --notch-h: clamp(2.6rem, 3.3vw, 3.4rem);
+  position: relative;
+  margin: 0;
+}
+.frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.frame path {
+  fill: var(--frame-fill);
+  stroke: var(--frame-line);
+  stroke-width: 1;
+  transition: stroke 0.5s var(--ease-out);
+}
+.open {
+  display: block;
+  width: 100%;
+  padding: var(--pad) var(--pad) calc(var(--notch-h) + var(--pad) * 0.6);
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.open:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: -0.5rem;
+  border-radius: 1rem;
+}
+.media {
+  position: relative;
+  display: block;
+  width: 100%;
+  /* the image's own proportions — shown whole */
+  aspect-ratio: var(--img-ratio, 1.5);
+  transition: transform 0.8s var(--ease-out);
+}
+
+/* caption sits in the notch, aligned to the card's right edge */
+.caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  max-width: 64%;
+  height: var(--notch-h);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-left: 1.1rem;
+  white-space: nowrap;
+}
+.captionInner {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6em;
+  min-width: 0;
+  font-size: clamp(0.9rem, 1vw, 1.05rem);
+  font-weight: 600;
+}
+.captionText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.captionIndex {
+  color: var(--c-accent);
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover .frame path,
+  .card:focus-within .frame path {
+    stroke: var(--c-accent);
+  }
+  .card:hover .media {
+    transform: translateY(-0.4rem) scale(1.015);
+  }
+}
+
+/* ── Full-size viewer ─────────────────────────────────────────────── */
+.dialog {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: var(--gutter);
+  border: 0;
+  background: rgba(17, 17, 18, 0.96);
+  color: var(--c-paper);
+}
+.dialog::backdrop {
+  background: transparent;
+}
+.dialog[open] {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 1rem;
+}
+.dialogBar,
+.dialogNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.9375rem;
+}
+.dialogBar button,
+.dialogNav button {
+  padding: 0.6rem 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.dialogStage {
+  position: relative;
+  min-height: 0;
+}
+
+/* ── Mobile: one column, in order ─────────────────────────────────── */
+@media (max-width: 899px) {
+  .columns {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* full-width cards (the desktop grid uses align-items: start) */
+    gap: var(--card-gap);
+  }
+  /* unwrap the columns so cards can be re-ordered 1, 2, 3… with `order` */
+  .column {
+    display: contents;
+  }
+  .column[data-column='1'] {
+    padding-top: 0;
+  }
+  .caption {
+    max-width: 78%;
+  }
+}

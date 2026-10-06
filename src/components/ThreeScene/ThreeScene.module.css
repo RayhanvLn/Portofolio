@@ -1,0 +1,16 @@
+.scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.canvas {
+  position: absolute;
+  inset: 0;
+}
+.fallback {
+  position: absolute;
+  inset: 8%;
+  width: 84%;
+  height: 84%;
+  color: var(--fg);
+}

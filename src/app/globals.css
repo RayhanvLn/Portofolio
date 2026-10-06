@@ -1,0 +1,337 @@
+/* ==========================================================================
+   DESIGN TOKENS — change colours, type scale and easing here.
+   Scene colours are registered with @property so dark ↔ light changes
+   interpolate smoothly everywhere they are used.
+   ========================================================================== */
+@property --bg {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #111112;
+}
+@property --fg {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #f1f0e9;
+}
+@property --muted {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #8d8d88;
+}
+@property --line {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(241, 240, 233, 0.16);
+}
+@property --accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ff8000;
+}
+@property --surface {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #1b1b1d;
+}
+
+:root {
+  /* Palette */
+  --c-dark: #111112;
+  --c-accent: #ff8000;
+  --c-paper: #f1f0e9;
+  --c-gray: #777777;
+
+  /* Dark scene (default) */
+  --bg: var(--c-dark);
+  --fg: var(--c-paper);
+  --muted: #8d8d88; /* #777 lifted slightly for AA contrast on dark */
+  --line: rgba(241, 240, 233, 0.16);
+  --accent: var(--c-accent);
+  --surface: #1b1b1d;
+
+  /* Type */
+  --font-sans: var(--font-archivo), 'Helvetica Neue', Arial, sans-serif;
+
+  /* Layout */
+  --gutter: clamp(1rem, 2.4vw, 2.5rem);
+  --nav-h: 4.5rem;
+  /* Menu toggle button (top-right). The home-hero logo aligns to its centre. */
+  --toggle-size: 3.25rem;
+  --toggle-offset: 0.75rem;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.87, 0, 0.13, 1);
+  --scene-duration: 0.9s;
+
+  transition:
+    --bg var(--scene-duration) var(--ease-out),
+    --fg var(--scene-duration) var(--ease-out),
+    --muted var(--scene-duration) var(--ease-out),
+    --line var(--scene-duration) var(--ease-out),
+    --accent var(--scene-duration) var(--ease-out),
+    --surface var(--scene-duration) var(--ease-out);
+}
+
+@media (max-width: 639px) {
+  :root {
+    --toggle-size: 3rem;
+    --toggle-offset: 0.6rem;
+  }
+}
+
+html[data-scene='light'] {
+  --bg: var(--c-paper);
+  --fg: var(--c-dark);
+  --muted: #5e5e59; /* #777 darkened for AA contrast on paper */
+  --line: rgba(17, 17, 18, 0.14);
+  --accent: var(--c-dark);
+  --surface: #e4e3db;
+}
+
+/* ==========================================================================
+   Reset
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  scrollbar-gutter: stable;
+  background: var(--bg);
+  overflow-x: clip;
+}
+body {
+  min-height: 100svh;
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 420;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: inherit;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+ul,
+ol {
+  list-style: none;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-weight: inherit;
+  font-size: inherit;
+  overflow-wrap: break-word;
+}
+p {
+  text-wrap: pretty;
+}
+::selection {
+  background: var(--c-accent);
+  color: var(--c-dark);
+}
+
+/* ==========================================================================
+   Lenis
+   ========================================================================== */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+html.is-locked {
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   Custom cursor — native cursor hidden only once the custom one is mounted
+   ========================================================================== */
+@media (hover: hover) and (pointer: fine) {
+  html.has-cursor,
+  html.has-cursor * {
+    cursor: none !important;
+  }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.skip-link {
+  position: fixed;
+  left: var(--gutter);
+  top: 0.75rem;
+  z-index: 2000;
+  padding: 0.75rem 1rem;
+  background: var(--c-accent);
+  color: var(--c-dark);
+  font-weight: 700;
+  transform: translateY(-200%);
+}
+.skip-link:focus-visible {
+  transform: none;
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+/* <main> receives focus after each page transition (for keyboard/screen-reader users); no ring on the whole page. */
+#main:focus {
+  outline: none;
+}
+
+/* ==========================================================================
+   Buttons & icons
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3.25rem;
+  padding: 0 1.6rem;
+  font-weight: 700;
+  font-stretch: 112%;
+  font-variation-settings: 'wdth' 112;
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+  transition:
+    background-color 0.5s var(--ease-out),
+    color 0.5s var(--ease-out),
+    border-color 0.5s var(--ease-out);
+}
+.btn > span {
+  display: inline-block;
+}
+.btn--accent {
+  background: var(--c-accent);
+  color: var(--c-dark);
+}
+.btn--outline {
+  border: 1px solid var(--fg);
+}
+@media (hover: hover) {
+  .btn--accent:hover {
+    background: var(--c-paper);
+  }
+  .btn--outline:hover {
+    background: var(--fg);
+    color: var(--bg);
+  }
+}
+.magnetic {
+  display: inline-block;
+  will-change: transform;
+}
+
+.icon-arrow {
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  flex-shrink: 0;
+  background: currentColor;
+  -webkit-mask: var(--svg-arrow) center / contain no-repeat;
+  mask: var(--svg-arrow) center / contain no-repeat;
+}
+.icon-arrow--right {
+  transform: rotate(45deg);
+}
+.icon-arrow--down {
+  transform: rotate(135deg);
+}
+.icon-arrow--up {
+  transform: rotate(-45deg);
+}
+
+/* ==========================================================================
+   Film grain (static, GPU-cheap)
+   ========================================================================== */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  pointer-events: none;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ==========================================================================
+   Page-level helpers
+   ========================================================================== */
+.page-pad-top {
+  padding-top: calc(var(--nav-h) + clamp(3rem, 10vh, 7rem));
+}
+
+/* ==========================================================================
+   Reduced motion: instant scene changes, no decorative movement.
+   Content stays fully visible and readable.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --scene-duration: 0s;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

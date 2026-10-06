@@ -1,0 +1,45 @@
+/* Letters roll up to an accent copy when the surrounding link is hovered or focused.
+   Colours: --roll-color (resting) and --roll-accent (hover) can be set by the parent. */
+.roll {
+  display: inline-flex;
+  white-space: nowrap;
+}
+.char {
+  position: relative;
+  display: inline-block;
+  /* clip vertically only, so tight negative tracking never cuts glyph edges */
+  clip-path: inset(0 -0.25em);
+}
+.a,
+.b {
+  display: block;
+  transition: transform 0.55s var(--ease-out);
+  transition-delay: calc(var(--i) * 22ms);
+}
+.a {
+  color: var(--roll-color, inherit);
+}
+.b {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  color: var(--roll-accent, var(--c-accent));
+}
+@media (hover: hover) {
+  :global(a):hover .a,
+  :global(a):hover .b,
+  :global(button):hover .a,
+  :global(button):hover .b {
+    transform: translateY(-100%);
+  }
+}
+:global(a):focus-visible .a,
+:global(a):focus-visible .b {
+  transform: translateY(-100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .a,
+  .b {
+    transition: none;
+  }
+}

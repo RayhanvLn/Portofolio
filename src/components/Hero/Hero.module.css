@@ -1,0 +1,306 @@
+.hero {
+  position: relative;
+  height: 100svh;
+  min-height: 620px;
+  overflow: clip;
+  color: var(--fg);
+  isolation: isolate;
+}
+.heading {
+  /* visually hidden h1 — the visual name is split across depth layers */
+  position: absolute;
+}
+
+/* Size of the oversized name, shared by both lines.
+   --title-cap: the largest it may get. useHeroTitleFit.ts measures the real
+   letters and writes --title-fit so the longest line fits between the margins;
+   until then the estimate below (≈0.9em per letter) is used. */
+.stage {
+  --chars: 4;
+  --title-cap: min(19vw, 24rem);
+  --title-size: var(--title-fit, min(var(--title-cap), calc((100vw - 2 * var(--gutter)) / (var(--chars) * 0.9))));
+  position: absolute;
+  inset: 0;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.bg {
+  inset: -5%;
+  z-index: 0;
+}
+.mid {
+  z-index: 1;
+}
+.subject {
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.fg {
+  z-index: 3;
+}
+
+/* ── Logo (centred, above the first name line) ───────
+   Drawn as a CSS mask of the logo file, so it keeps its exact shape but takes the
+   text colour of the scene (the source SVG is black). Vertically centred on the
+   menu toggle (--toggle-size / --toggle-offset in globals.css). */
+.brand {
+  --brand-w: clamp(46px, 4vw, 64px);
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--toggle-offset) + var(--toggle-size) / 2 - var(--brand-w) / (2 * var(--logo-ratio)));
+  z-index: 4;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--fg);
+}
+.brandMark {
+  display: block;
+  width: var(--brand-w);
+  aspect-ratio: var(--logo-ratio);
+  background: currentColor;
+  -webkit-mask: var(--logo-src) center / contain no-repeat;
+  mask: var(--logo-src) center / contain no-repeat;
+}
+
+/* ── Oversized name ─────────────────────────────────── */
+.title {
+  position: absolute;
+  display: block;
+  font-weight: 850;
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  line-height: 0.82;
+  white-space: nowrap;
+  font-size: var(--title-size);
+}
+.titleBack {
+  left: var(--gutter);
+  top: calc(var(--nav-h) + 3vh);
+  color: var(--fg);
+}
+.titleFront {
+  right: var(--gutter);
+  bottom: 15vh;
+  color: var(--c-accent);
+  text-align: right;
+}
+
+/* ── Subject ───────────────────────────────────────── */
+.subjectFrame {
+  position: relative;
+  height: 90svh;
+  aspect-ratio: 3 / 4;
+  max-width: 100vw;
+  transform-origin: 50% 100%;
+  will-change: transform, clip-path;
+}
+.subjectFrame picture,
+.subjectImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.subjectImg {
+  object-fit: contain;
+  object-position: 50% 100%;
+}
+.backdrop {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(17, 17, 18, 0.25) 0%, rgba(17, 17, 18, 0.1) 40%, rgba(17, 17, 18, 0.85) 100%);
+}
+.silhouette {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 8%;
+  color: rgba(241, 240, 233, 0.6);
+  font-size: 0.8125rem;
+  text-align: center;
+  background: radial-gradient(38% 22% at 50% 22%, rgba(241, 240, 233, 0.16), transparent 70%),
+    radial-gradient(60% 50% at 50% 100%, rgba(241, 240, 233, 0.14), transparent 70%);
+}
+
+.object {
+  position: absolute;
+  right: 9vw;
+  top: 18vh;
+  width: clamp(200px, 26vw, 440px);
+  aspect-ratio: 1;
+}
+
+/* ── UI row ────────────────────────────────────────── */
+.ui {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 4;
+  will-change: transform, opacity;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  align-items: end;
+  padding: 0 var(--gutter) var(--gutter);
+}
+.meta {
+  grid-column: 1 / span 3;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+}
+.metaMuted {
+  color: var(--muted);
+}
+.intro {
+  grid-column: 4 / span 4;
+  max-width: 34ch;
+  font-size: clamp(1rem, 1.15vw, 1.15rem);
+  line-height: 1.45;
+}
+.actions {
+  grid-column: 9 / span 4;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.secondary {
+  font-size: 0.9375rem;
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+  text-decoration-thickness: 1px;
+}
+.scrollCue {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: max-content;
+  margin-inline: auto;
+  bottom: calc(var(--gutter) + 0.25rem);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  will-change: transform, opacity;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.scrollLine {
+  position: relative;
+  width: 1px;
+  height: 3.5rem;
+  overflow: hidden;
+  background: var(--line);
+}
+.scrollLine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--fg);
+  transform: translateY(-100%);
+  animation: scrollCue 2.2s var(--ease-in-out) infinite;
+}
+@keyframes scrollCue {
+  0% {
+    transform: translateY(-100%);
+  }
+  55%,
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/* ── Tablet ─────────────────────────────────────────── */
+@media (max-width: 1199px) {
+  .meta {
+    grid-column: 1 / span 4;
+  }
+  .intro {
+    grid-column: 5 / span 4;
+  }
+  .actions {
+    grid-column: 9 / span 4;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+  }
+}
+
+/* ── Mobile: intentional stack, not a shrunk desktop ── */
+@media (max-width: 899px) {
+  .hero {
+    min-height: 560px;
+  }
+  .stage {
+    --title-cap: 24vw;
+    /* Photo size on phones/tablets. --subject-max: widest it may get (above 100vw the
+       left and right edges of the photo run off the screen); it also never rises
+       above the first name line. */
+    --subject-max: 120vw;
+  }
+  .titleBack {
+    top: calc(var(--nav-h) + 2vh);
+  }
+  .titleFront {
+    bottom: auto;
+    top: calc(var(--nav-h) + 2vh + 0.84 * var(--title-size));
+    right: auto;
+    left: var(--gutter);
+    text-align: left;
+  }
+  .subjectFrame {
+    /* width-led (3:4): as large as fits below the first name line, up to --subject-max */
+    height: auto;
+    width: min(var(--subject-max), 0.75 * (100svh - var(--nav-h) - 2vh - 1.2 * var(--title-size)));
+    max-width: none;
+    flex: none;
+  }
+  .object {
+    right: -6vw;
+    top: auto;
+    bottom: 30svh;
+    width: 42vw;
+  }
+  .ui {
+    grid-template-columns: 1fr;
+    row-gap: 1rem;
+    padding-bottom: calc(var(--gutter) + 0.5rem);
+    background: linear-gradient(180deg, transparent, var(--bg) 45%);
+    padding-top: 4rem;
+  }
+  .meta,
+  .intro,
+  .actions {
+    grid-column: 1;
+  }
+  .meta {
+    grid-auto-flow: column;
+    justify-content: space-between;
+  }
+  .actions {
+    justify-self: stretch;
+    justify-content: space-between;
+  }
+  .scrollCue {
+    display: none;
+  }
+}

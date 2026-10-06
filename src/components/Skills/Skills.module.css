@@ -1,0 +1,128 @@
+.skills {
+  position: relative;
+  padding: clamp(6rem, 14vh, 10rem) var(--gutter);
+}
+.head {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  margin-bottom: clamp(3rem, 8vh, 6rem);
+}
+.title {
+  grid-column: 1 / span 8;
+  font-weight: 850;
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  line-height: 0.84;
+  font-size: clamp(3rem, 7vw, 8rem);
+}
+
+.list {
+  position: relative;
+  padding-left: clamp(1.5rem, 3vw, 3rem);
+}
+.rail {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+.railFill {
+  position: absolute;
+  inset: 0;
+  background: var(--fg);
+  transform: scaleY(0);
+  transform-origin: 50% 0%;
+}
+.indicator {
+  position: absolute;
+  left: -0.35rem;
+  top: 0;
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--c-accent);
+  box-shadow: 0 0 0 1px var(--fg);
+  will-change: transform;
+}
+
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  align-items: baseline;
+  padding: clamp(1.5rem, 4vh, 2.75rem) 0;
+}
+.rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--line);
+  transform: scaleX(0);
+  transform-origin: 0% 50%;
+}
+.num {
+  grid-column: 1 / span 2;
+  font-weight: 850;
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+  letter-spacing: -0.05em;
+  line-height: 0.8;
+  font-size: clamp(3rem, 7vw, 8rem);
+  font-variant-numeric: tabular-nums;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--muted);
+  transition: color 0.6s var(--ease-out), -webkit-text-stroke-color 0.6s;
+}
+.row[data-active='true'] .num {
+  color: var(--fg);
+  -webkit-text-stroke-color: var(--fg);
+}
+.name {
+  grid-column: 3 / span 5;
+  font-weight: 800;
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  font-size: clamp(1.6rem, 3vw, 3.25rem);
+}
+.body {
+  grid-column: 8 / span 5;
+  display: grid;
+  gap: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.45;
+  max-width: 42ch;
+}
+.labels {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 899px) {
+  .head,
+  .row {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .title {
+    grid-column: 1 / -1;
+  }
+  .num {
+    grid-column: 1 / span 2;
+  }
+  .name {
+    grid-column: 3 / -1;
+  }
+  .body {
+    grid-column: 3 / -1;
+    margin-top: 0.75rem;
+  }
+}

@@ -1,0 +1,102 @@
+.strip {
+  padding: clamp(5rem, 12vh, 9rem) 0;
+  overflow: hidden;
+}
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 0 var(--gutter);
+  margin-bottom: clamp(2rem, 5vh, 3.5rem);
+}
+.title {
+  font-weight: 850;
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  line-height: 0.84;
+  font-size: clamp(2.75rem, 6vw, 7rem);
+}
+.hint {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.viewport {
+  cursor: grab;
+  user-select: none;
+}
+.viewport:active {
+  cursor: grabbing;
+}
+.track {
+  display: flex;
+  gap: clamp(1rem, 2vw, 2rem);
+  padding: 0 var(--gutter);
+  width: max-content;
+  will-change: transform;
+}
+.item {
+  width: clamp(260px, 34vw, 560px);
+  flex-shrink: 0;
+}
+.item:nth-child(even) {
+  margin-top: 6vh;
+}
+.frame {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: var(--surface);
+}
+.img {
+  filter: grayscale(1);
+  transition: filter 0.8s var(--ease-out);
+  pointer-events: none;
+}
+.item[data-color='true'] .img {
+  filter: none;
+}
+.caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.75rem;
+  font-size: 0.875rem;
+}
+.meta {
+  color: var(--muted);
+}
+
+/* Mouse-drag mode (wide screen + mouse/trackpad): the page still scrolls
+   vertically over the strip; horizontal moves are handled in LifestyleStrip.tsx. */
+@media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+  .viewport {
+    touch-action: pan-y;
+  }
+}
+
+/* Everything else — phones, tablets, touch screens — native swipe rail with snapping.
+   (Exactly the opposite of the query above, so one of the two always applies.) */
+@media not all and (min-width: 900px) and (hover: hover) and (pointer: fine) {
+  .viewport {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    touch-action: auto;
+    cursor: auto;
+  }
+  .viewport::-webkit-scrollbar {
+    display: none;
+  }
+  .item {
+    width: 78vw;
+    scroll-snap-align: center;
+  }
+  .item:nth-child(even) {
+    margin-top: 0;
+  }
+}

@@ -1,0 +1,27 @@
+.image {
+  object-fit: cover;
+}
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 1rem;
+  background:
+    radial-gradient(120% 90% at 70% 20%, rgba(255, 128, 0, 0.12), transparent 60%),
+    linear-gradient(160deg, #26262a, #141416);
+  color: rgba(241, 240, 233, 0.7);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+.placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--svg-contour-2) center / cover no-repeat;
+  opacity: 0.12;
+}
+.placeholderText {
+  position: relative;
+  display: block;
+}

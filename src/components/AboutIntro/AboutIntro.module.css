@@ -1,0 +1,103 @@
+/* About page opening — hierarchy: first name (primary) → other names + role (secondary) → lead. */
+.intro {
+  padding: calc(var(--toggle-offset) * 2 + var(--toggle-size) + clamp(1.25rem, 5vh, 3.5rem)) var(--gutter)
+    clamp(4rem, 12vh, 8rem);
+  overflow: clip;
+}
+
+/* meta row + rule */
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 0.9rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.metaLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--fg);
+}
+.metaMark {
+  width: 0.55rem;
+  height: 0.55rem;
+  background: var(--c-accent);
+}
+.metaRight {
+  text-align: right;
+}
+.rule {
+  display: block;
+  height: 1px;
+  background: var(--line);
+  transform-origin: 0% 50%;
+}
+
+/* names */
+.names {
+  margin-top: clamp(1.75rem, 5vh, 3.5rem);
+}
+.first {
+  /* upper bound — FitText shrinks it so the first name fills exactly one line */
+  font-size: 28vw;
+  font-weight: 850;
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  line-height: 0.8;
+  white-space: nowrap;
+}
+.second {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.4rem 2rem;
+  margin-top: clamp(0.9rem, 2.4vh, 1.75rem);
+  font-size: clamp(1.75rem, 4.4vw, 5.25rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+.rest {
+  font-weight: 850;
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+  letter-spacing: -0.045em;
+}
+/* the site's accent voice: same family, narrow and light, orange */
+.role {
+  display: inline-block;
+  font-weight: 300;
+  font-stretch: 62%;
+  font-variation-settings: 'wdth' 62;
+  letter-spacing: -0.01em;
+  color: var(--c-accent);
+}
+
+/* lead */
+.foot {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  margin-top: clamp(2.5rem, 8vh, 5.5rem);
+}
+.lead {
+  grid-column: 7 / span 6;
+  max-width: 42ch;
+  font-size: clamp(1.1rem, 1.45vw, 1.45rem);
+  line-height: 1.4;
+}
+
+@media (max-width: 899px) {
+  .second {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .lead {
+    grid-column: 1 / -1;
+  }
+}

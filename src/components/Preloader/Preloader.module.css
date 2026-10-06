@@ -1,0 +1,126 @@
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: var(--gutter);
+  background: var(--c-dark);
+  color: var(--c-paper);
+  overflow: hidden;
+}
+:global(html[data-preloaded='true']) .preloader {
+  display: none;
+}
+
+.backdrop {
+  position: absolute;
+  inset: -10%;
+  background: var(--svg-contour-2) 60% 40% / cover no-repeat;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.top {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: rgba(241, 240, 233, 0.62);
+}
+
+.word {
+  --chars: 9;
+  position: relative;
+  align-self: end;
+  font-weight: 850;
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  line-height: 0.82;
+  font-size: min(15vw, calc((100vw - 2 * var(--gutter)) / (var(--chars) * 0.82)));
+  white-space: nowrap;
+  padding-bottom: 0.06em;
+}
+.outline {
+  display: block;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(241, 240, 233, 0.35);
+}
+.fill {
+  position: absolute;
+  inset: 0;
+  display: block;
+  color: var(--c-accent);
+  clip-path: inset(100% 0% 0% 0%);
+}
+
+.bottom {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.counter {
+  display: inline-flex;
+  align-items: flex-start;
+  overflow: hidden;
+  font-weight: 800;
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+  font-size: clamp(3rem, 9vw, 8rem);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.counterValue {
+  display: inline-block;
+}
+.percent {
+  font-size: 0.4em;
+  margin-left: 0.08em;
+  color: var(--c-accent);
+}
+
+.enter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.1rem 2rem 1.15rem;
+  background: var(--c-accent);
+  color: var(--c-dark);
+  font-weight: 800;
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+  font-size: clamp(1.25rem, 2.2vw, 2rem);
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  visibility: hidden;
+  opacity: 0;
+}
+.enter[data-visible='true'] {
+  visibility: visible;
+}
+.enter:focus-visible {
+  outline: 2px solid var(--c-paper);
+  outline-offset: 4px;
+}
+.hint {
+  font-size: 0.875rem;
+  color: rgba(241, 240, 233, 0.62);
+}
+
+@media (max-width: 639px) {
+  .bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .enter {
+    width: 100%;
+    justify-content: center;
+  }
+}

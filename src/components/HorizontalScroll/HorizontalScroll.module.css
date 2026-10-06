@@ -1,0 +1,174 @@
+.section {
+  position: relative;
+  /* Vertical budget of the pinned rail (desktop). Cards are sized from these
+     so image + text always fit between the navbar and the progress line. */
+  --rail-top: 5.5rem; /* space for the floating navbar */
+  --rail-bottom: 4.5rem; /* progress line + counter row */
+  --rail-meta: 14rem; /* card text: title, category, description, "Open case study" */
+  --rail-stagger: 3vh; /* zig-zag: odd cards sit this much higher, even cards this much lower */
+}
+.pin {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  /* row 1: the rail · row 2: progress line + counter (own row, so cards never overlap it) */
+  grid-template-rows: minmax(0, 1fr) var(--rail-bottom);
+  padding-top: var(--rail-top);
+}
+.track {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: clamp(2rem, 4vw, 5rem);
+  width: max-content;
+  padding: 0 var(--gutter);
+  will-change: transform;
+}
+
+.intro {
+  flex-shrink: 0;
+  /* Width of the title column. The title is auto-fitted to this width. */
+  width: min(42vw, 680px);
+  padding-right: clamp(1rem, 2vw, 2.5rem);
+  display: grid;
+  /* minmax(0, 1fr): stop the column growing to the longest word, so FitText can measure the real width. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-content: center;
+}
+.title {
+  font-weight: 850;
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  line-height: 0.82;
+  /* Maximum size. FitText shrinks it automatically if the longest word would not fit the column. */
+  font-size: clamp(3rem, 7vw, 8.5rem);
+  min-width: 0;
+  /* Each line stays whole (never "PROJE / CTS"); FitText shrinks the size instead. */
+  white-space: nowrap;
+}
+.title h1,
+.title h2 {
+  overflow-wrap: normal;
+}
+.introText {
+  max-width: 34ch;
+  font-size: clamp(1rem, 1.2vw, 1.2rem);
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.card {
+  /* As wide as 56vw / 920px allows, but never so tall that the card's text would
+     drop below the rail: image height = what is left of the screen height, × the
+     cover's own width/height ratio (--cover-ratio, set on each card). */
+  width: min(56vw, 920px, max(320px, calc((100vh - var(--rail-top) - var(--rail-bottom) - var(--rail-meta) - 2 * var(--rail-stagger)) * var(--cover-ratio, 1.6))));
+  width: min(56vw, 920px, max(320px, calc((100svh - var(--rail-top) - var(--rail-bottom) - var(--rail-meta) - 2 * var(--rail-stagger)) * var(--cover-ratio, 1.6))));
+}
+/* Balanced zig-zag (margins inside a centred row shift each card by half the margin). */
+.card:nth-of-type(odd) {
+  margin-bottom: calc(var(--rail-stagger) * 2);
+}
+.card:nth-of-type(even) {
+  margin-top: calc(var(--rail-stagger) * 2);
+}
+
+.end {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: min(32vw, 460px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  font-weight: 800;
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  font-size: clamp(1.25rem, 2vw, 2rem);
+  text-align: center;
+  transition: background-color 0.6s var(--ease-out), color 0.6s var(--ease-out), border-color 0.6s;
+}
+@media (hover: hover) {
+  .end:hover {
+    background: var(--c-accent);
+    border-color: var(--c-accent);
+    color: var(--c-dark);
+  }
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0 var(--gutter);
+}
+.progress {
+  position: relative;
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.progressBar {
+  position: absolute;
+  inset: 0;
+  background: var(--c-accent);
+  transform: scaleX(0);
+  transform-origin: 0% 50%;
+}
+.counter {
+  flex-shrink: 0;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* Mobile/tablet + reduced motion: native swipe rail with snap instead of a pin. */
+@media (max-width: 899px), (prefers-reduced-motion: reduce) {
+  .pin {
+    display: block;
+    height: auto;
+    overflow: visible;
+    padding: 6rem 0 4rem;
+  }
+  .track {
+    width: auto;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    align-items: stretch;
+    padding-bottom: 1rem;
+  }
+  .track::-webkit-scrollbar {
+    display: none;
+  }
+  .intro {
+    width: 78vw;
+    scroll-snap-align: start;
+  }
+  .card {
+    width: 82vw;
+    scroll-snap-align: start;
+  }
+  .card:nth-of-type(n) {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  .end {
+    width: 60vw;
+    align-self: center;
+    scroll-snap-align: start;
+  }
+  .foot {
+    display: none;
+  }
+}
