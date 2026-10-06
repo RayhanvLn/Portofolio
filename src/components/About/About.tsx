@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { gsap, useGSAP } from '@/lib/animation';
 import { fadeUp } from '@/animations/scrollAnimations';
 import { mq } from '@/lib/responsive';
+import { useFitText } from '@/hooks/useFitText';
 import type { AboutContent, ImageAsset, SceneTheme } from '@/types/portfolio';
 import { Scene } from '@/components/Scene/Scene';
 import { ImageReveal } from '@/components/ImageReveal/ImageReveal';
@@ -26,6 +27,10 @@ interface AboutProps {
 export function About({ about, portrait, variant = 'teaser', theme = 'light', headingId = 'about-heading' }: AboutProps) {
   const root = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<number | null>(null);
+  const list = useRef<HTMLUListElement>(null);
+  // Phones and tablets: the longest word (e.g. "DEVELOPMENT") always fits the screen, leaving
+  // room for the square marker and the shift of the open item. Never grows past the CSS size.
+  useFitText(list, { lines: '[data-fit-line]', query: mq.belowTablet, fill: 0.86 });
 
   useGSAP(
     () => {
@@ -66,7 +71,7 @@ export function About({ about, portrait, variant = 'teaser', theme = 'light', he
         <h2 id={headingId} className="sr-only">
           About
         </h2>
-        <ul className={styles.disciplines} data-has-active={active !== null}>
+        <ul ref={list} className={styles.disciplines} data-has-active={active !== null}>
           {about.disciplines.map((d, i) => {
             const open = active === i;
             return (
@@ -81,7 +86,7 @@ export function About({ about, portrait, variant = 'teaser', theme = 'light', he
                 >
                   <span className={styles.disciplineWords}>
                     {d.words.map((w) => (
-                      <span key={w} style={{ display: 'block' }}>
+                      <span key={w} className={styles.disciplineLine} data-fit-line>
                         {w}
                       </span>
                     ))}
@@ -111,6 +116,7 @@ export function About({ about, portrait, variant = 'teaser', theme = 'light', he
         </div>
 
         <div className={styles.text}>
+          {/* teaser (home): first paragraph only · full (about page): skip the first, it is already the page lead */}
           {(variant === 'teaser' ? about.bio.slice(0, 1) : about.bio.slice(1)).map((p, i) => (
             <p key={i} data-fade>
               {p}

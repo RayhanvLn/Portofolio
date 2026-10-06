@@ -14,6 +14,8 @@
   grid-column: 1 / span 7;
   align-self: start;
   display: grid;
+  /* size of the discipline words (upper bound) — About.tsx shrinks it so the longest word fits */
+  font-size: clamp(2.6rem, 6.2vw, 7.5rem);
 }
 .discipline {
   border-top: 1px solid var(--line);
@@ -35,12 +37,18 @@
   text-transform: uppercase;
   letter-spacing: -0.05em;
   line-height: 0.84;
-  font-size: clamp(2.6rem, 6.2vw, 7.5rem);
+  font-size: 1em;
   color: var(--fg);
   transition: color 0.5s var(--ease-out), padding 0.7s var(--ease-out);
 }
 .disciplineWords {
   display: block;
+  min-width: 0;
+}
+.disciplineLine {
+  display: block;
+  /* one word per row, never split (not even at the hyphen in "Full-stack") */
+  white-space: nowrap;
 }
 .disciplineMark {
   width: 0.28em;
