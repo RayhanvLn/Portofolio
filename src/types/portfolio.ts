@@ -72,6 +72,8 @@ export interface LifestyleItem {
   meta: string;
   /** Show in colour instead of the default grayscale treatment. */
   color?: boolean;
+  /** Which part of the photo stays in view on the portrait card, e.g. '50% 30%'. Default: centre. */
+  focus?: string;
 }
 
 export interface CollageContent {

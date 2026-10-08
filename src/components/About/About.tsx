@@ -28,9 +28,9 @@ export function About({ about, portrait, variant = 'teaser', theme = 'light', he
   const root = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<number | null>(null);
   const list = useRef<HTMLUListElement>(null);
-  // Phones and tablets: the longest word (e.g. "DEVELOPMENT") always fits the screen, leaving
+  // Every screen size: the longest line (e.g. "WEB DEVELOPMENT") always fits its column, leaving
   // room for the square marker and the shift of the open item. Never grows past the CSS size.
-  useFitText(list, { lines: '[data-fit-line]', query: mq.belowTablet, fill: 0.86 });
+  useFitText(list, { lines: '[data-fit-line]', fill: 0.86 });
 
   useGSAP(
     () => {
