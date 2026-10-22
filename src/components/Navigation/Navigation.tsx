@@ -9,6 +9,7 @@ import { useSmoothScroll } from '@/hooks/useSmoothScroll';
 import { useFitText } from '@/hooks/useFitText';
 import { mq } from '@/lib/responsive';
 import { TransitionLink } from '@/components/PageTransition/TransitionLink';
+import { usePageTransition } from '@/hooks/usePageTransition';
 import { RollText } from '@/components/RollText/RollText';
 import styles from './Navigation.module.css';
 
@@ -41,6 +42,11 @@ export function Navigation() {
   const toggleBtn = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
   const openRef = useRef(false);
+  // A menu link was clicked: the menu stays open during the page transition (the orange logo grows
+  // over the dark menu) and only closes once the new page is in.
+  const [leaving, setLeaving] = useState(false);
+  const leavingRef = useRef(false);
+  const { isTransitioning } = usePageTransition();
   const list = useRef<HTMLUListElement>(null);
   // Phones and tablets: the longest label fills about three quarters of the width, never edge to edge.
   useFitText(list, { lines: '[data-fit-line]', query: mq.belowTablet, fill: 0.74 });
@@ -57,8 +63,37 @@ export function Navigation() {
     [lock, unlock],
   );
 
-  // Close on route change.
-  useEffect(() => setMenu(false), [pathname, setMenu]);
+  const stopLeaving = useCallback(() => {
+    leavingRef.current = false;
+    setLeaving(false);
+  }, []);
+
+  // Route change. Leaving through the menu: the new page is still under the transition screen —
+  // hide the menu panel at once (so it never shows through the logo window); the menu itself
+  // closes when the transition has finished (below). Otherwise: close as usual.
+  useEffect(() => {
+    if (leavingRef.current) {
+      if (menu.current) gsap.set(menu.current, { visibility: 'hidden', clipPath: 'inset(0% 0% 100% 0%)' });
+      return;
+    }
+    setMenu(false);
+  }, [pathname, setMenu]);
+
+  // The page transition has finished: now close the menu (the toggle turns back into the bars).
+  useEffect(() => {
+    if (isTransitioning || !leavingRef.current) return;
+    stopLeaving();
+    setMenu(false);
+  }, [isTransitioning, setMenu, stopLeaving]);
+
+  // Safety: the click did not start a transition (e.g. one was already running) — back to normal.
+  useEffect(() => {
+    if (!leaving) return;
+    const id = window.setTimeout(() => {
+      if (leavingRef.current && !isTransitioning) stopLeaving();
+    }, 600);
+    return () => window.clearTimeout(id);
+  }, [leaving, isTransitioning, stopLeaving]);
 
   // While open: Escape closes, Tab stays inside (toggle + menu).
   useEffect(() => {
@@ -167,7 +202,9 @@ export function Navigation() {
         ref={menu}
         id="site-menu"
         className={styles.menu}
+        data-transition-solid
         data-open={open}
+        data-leaving={leaving}
         role="dialog"
         aria-modal="true"
         aria-label="Site menu"
@@ -185,7 +222,15 @@ export function Navigation() {
                       href={item.href}
                       className={styles.menuLink}
                       aria-current={active ? 'page' : undefined}
-                      onClick={() => setMenu(false)}
+                      onClick={() => {
+                        // same page: just close; another page: keep the menu open through the transition
+                        if (item.href === pathname) {
+                          setMenu(false);
+                          return;
+                        }
+                        leavingRef.current = true;
+                        setLeaving(true);
+                      }}
                     >
                       <span className="sr-only">{item.label}</span>
                       <span className={styles.menuLabel} data-fit-line>

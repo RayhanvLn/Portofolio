@@ -129,6 +129,9 @@ export interface Skill {
   title: string;
   description: string;
   labels: string[];
+  /** Optional: tools with their own logo file (e.g. '/images/skills/react.svg') and an optional
+   *  photo shown on hover. Without it, `labels` are used with lettered badges. */
+  tools?: Array<{ name: string; icon?: string; photo?: string }>;
 }
 
 export interface ExperienceItem {
@@ -136,6 +139,12 @@ export interface ExperienceItem {
   role: string;
   organisation: string;
   note: string;
+  /** Photo for this role. Optional: without it, public/images/experience/experience-01.webp, -02… is used (in order). */
+  image?: ImageAsset;
+  /** Accent colour for this role (hex). Optional: a warm tone from the site palette is picked in order. */
+  tone?: string;
+  /** Tools / tech used in this role, shown as pills on the card, e.g. ['Next.js', 'Node.js', 'Prisma']. Optional. */
+  tags?: string[];
 }
 
 export interface ContactContent {

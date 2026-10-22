@@ -8,7 +8,7 @@ export const contactPage = {
   /** Fixed first word of the headline. */
   lead: 'Say',
   /** Greetings that take turns after the lead word — here, the languages you speak. */
-  greetings: ['Hello', 'Halo', 'Konnichiwa'],
+  greetings: ['Hello', 'Bonjour', 'こんにちは', 'Ola'],
   /** Seconds each greeting stays before the next rolls in. */
   greetingHold: 1.8,
   /** Heading above the list of channels. */

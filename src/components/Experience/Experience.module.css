@@ -1,5 +1,43 @@
+/* ── Experience: centred timeline, cards alternating right / left ────────
+   --tone: colour of the active role (background glow); --item-tone: each role's own colour.
+   Tones are set in Experience.tsx (TONES) or per role with `tone` in portfolio.ts.
+   Copy (intro line, photos on/off, "Role" label): src/data/experienceSection.ts. */
 .experience {
-  padding: clamp(5rem, 12vh, 9rem) var(--gutter);
+  position: relative;
+  overflow: clip;
+  padding: clamp(5rem, 12vh, 9rem) var(--gutter) clamp(6rem, 18vh, 12rem);
+}
+.inner {
+  position: relative;
+  --axis: 3.5rem; /* width of the middle column holding the line */
+  --card-max: 31rem;
+}
+
+/* soft warm light in the middle, takes the active role's tone */
+.glow {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: min(70vw, 60rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: var(--tone);
+  opacity: 0.1;
+  filter: blur(140px);
+  pointer-events: none;
+  transition: background-color 0.9s var(--ease-out);
+}
+
+/* ── Heading (centred above the line) ─────────────────────────────── */
+.head {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  margin-bottom: clamp(3.5rem, 12vh, 8rem);
+  text-align: center;
 }
 .title {
   font-weight: 850;
@@ -8,75 +46,352 @@
   text-transform: uppercase;
   letter-spacing: -0.05em;
   line-height: 0.84;
-  font-size: clamp(2.75rem, 6vw, 7rem);
-  margin-bottom: clamp(2.5rem, 6vh, 4.5rem);
+  font-size: clamp(2.75rem, 7vw, 8.5rem);
 }
+.intro {
+  max-width: 30rem;
+  color: var(--muted);
+  font-size: clamp(0.95rem, 1.1vw, 1.0625rem);
+}
+
+/* ── The list + the line down the middle ──────────────────────────── */
 .list {
-  border-top: 1px solid var(--line);
-}
-.item {
   position: relative;
-  isolation: isolate;
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: var(--gutter);
-  align-items: baseline;
-  padding: 1.5rem 0;
-  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  /* about one role in focus per screen, like the reference */
+  gap: clamp(5rem, 26vh, 16rem);
+  padding: clamp(2rem, 8vh, 5rem) 0;
 }
-.sweep {
+.rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: var(--line);
+  pointer-events: none;
+}
+/* the part of the line already scrolled through */
+.railFill {
   position: absolute;
   inset: 0;
-  background: var(--c-accent);
-  transform: scaleX(0);
-  transform-origin: 0% 50%;
-  z-index: -1;
-  transition: transform 0.7s var(--ease-out);
+  background: linear-gradient(to bottom, transparent, rgba(241, 240, 233, 0.45) 12%, rgba(241, 240, 233, 0.45));
+  transform-origin: 50% 0;
+  transform: scaleY(0);
+}
+
+/* one role: [left side] [line] [right side] */
+.item {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--axis) minmax(0, 1fr);
+  align-items: center;
+}
+.item[data-side='right'] {
+  grid-template-areas: 'photo axis card';
+}
+.item[data-side='left'] {
+  grid-template-areas: 'card axis photo';
+}
+
+/* ── Ring + this role's stretch of line ───────────────────────────── */
+.axis {
+  grid-area: axis;
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.segment {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: var(--item-tone);
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+  transition: transform 0.9s var(--ease-out);
+}
+.item[data-active='true'] .segment {
+  transform: scaleY(1);
+}
+.node {
+  position: relative;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid var(--muted);
+  background: var(--bg);
+  transition:
+    border-color 0.5s var(--ease-out),
+    background-color 0.5s var(--ease-out),
+    box-shadow 0.6s var(--ease-out),
+    transform 0.6s var(--ease-out);
+}
+.item[data-active='true'] .node {
+  border-color: var(--item-tone);
+  background: var(--item-tone);
+  transform: scale(1.15);
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--item-tone) 18%, transparent),
+    0 0 26px 2px color-mix(in srgb, var(--item-tone) 45%, transparent);
+}
+
+/* ── Card ─────────────────────────────────────────────────────────── */
+.card {
+  grid-area: card;
+  position: relative;
+  width: 100%;
+  max-width: var(--card-max);
+  padding: clamp(1.4rem, 2.2vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: 1.1rem;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  box-shadow: 0 40px 80px -50px rgba(0, 0, 0, 0.8);
+  transition:
+    border-color 0.6s var(--ease-out),
+    box-shadow 0.6s var(--ease-out);
+  will-change: transform, opacity, filter;
+}
+.item[data-active='true'] .card {
+  border-color: color-mix(in srgb, var(--item-tone) 55%, transparent);
+  box-shadow:
+    0 40px 80px -50px rgba(0, 0, 0, 0.8),
+    0 0 0 1px color-mix(in srgb, var(--item-tone) 20%, transparent);
+}
+/* the card hugs the line; text aligns towards it (like the reference) */
+.item[data-side='right'] .card {
+  justify-self: start;
+}
+.item[data-side='left'] .card {
+  justify-self: end;
+  text-align: right;
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.item[data-side='left'] .cardTop {
+  flex-direction: row-reverse;
+}
+.index {
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  color: var(--item-tone);
 }
 .period {
-  grid-column: 1 / span 3;
-  font-size: 0.9375rem;
-  font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
+.liveDot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--item-tone);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--item-tone) 55%, transparent);
+  animation: livePulse 2.4s ease-out infinite;
+}
+@keyframes livePulse {
+  70% {
+    box-shadow: 0 0 0 0.45rem color-mix(in srgb, var(--item-tone) 0%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--item-tone) 0%, transparent);
+  }
+}
+
 .role {
-  grid-column: 4 / span 4;
-  font-weight: 750;
+  font-weight: 850;
   font-stretch: 112%;
   font-variation-settings: 'wdth' 112;
-  font-size: clamp(1.25rem, 2vw, 2rem);
-  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  font-size: clamp(1.5rem, 2.3vw, 2.25rem);
 }
 .org {
-  grid-column: 8 / span 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.7rem;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+.item[data-side='left'] .org {
+  flex-direction: row-reverse;
+}
+.orgMark {
+  width: 0.55rem;
+  height: 0.55rem;
+  background: var(--item-tone);
 }
 .note {
-  grid-column: 10 / span 3;
+  margin-top: 1.1rem;
+  max-width: 42ch;
   color: var(--muted);
-  font-size: 0.9375rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
-@media (hover: hover) {
-  .item {
-    transition: color 0.5s;
-  }
-  .item:hover .sweep {
-    transform: scaleX(1);
-  }
-  .item:hover,
-  .item:hover .period,
-  .item:hover .note {
-    color: var(--c-dark);
-  }
+.item[data-side='left'] .note {
+  margin-left: auto;
 }
+
+/* tech pills */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 1.4rem;
+}
+.item[data-side='left'] .tags {
+  justify-content: flex-end;
+}
+.tag {
+  padding: 0.42rem 0.7rem 0.38rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(241, 240, 233, 0.04);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition:
+    border-color 0.4s var(--ease-out),
+    color 0.4s var(--ease-out);
+}
+.item[data-active='true'] .tag {
+  border-color: color-mix(in srgb, var(--item-tone) 35%, var(--line));
+}
+
+/* ── Photo on the empty side ──────────────────────────────────────── */
+.photo {
+  grid-area: photo;
+  position: relative;
+  width: min(100%, 17rem);
+  will-change: transform, opacity, filter;
+}
+/* the photo sits close to the line too */
+.item[data-side='right'] .photo {
+  justify-self: end;
+  margin-right: clamp(0.5rem, 2vw, 2rem);
+}
+.item[data-side='left'] .photo {
+  justify-self: start;
+  margin-left: clamp(0.5rem, 2vw, 2rem);
+}
+/* offset block in the role's tone behind the photo */
+.photoBlock {
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  background: var(--item-tone);
+  transform: translate(0.7rem, 0.7rem);
+  opacity: 0.85;
+}
+.item[data-side='right'] .photoBlock {
+  transform: translate(-0.7rem, 0.7rem);
+}
+.photoFrame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--surface);
+  filter: grayscale(0.85) contrast(1.05);
+  transition: filter 0.9s var(--ease-out);
+}
+.item[data-active='true'] .photoFrame {
+  filter: none;
+}
+
+/* ── Phones / small tablets: line on the left, everything to its right ── */
 @media (max-width: 899px) {
-  .item {
-    grid-template-columns: 1fr;
-    row-gap: 0.35rem;
+  .inner {
+    --axis: 2.25rem;
   }
-  .period,
-  .role,
-  .org,
-  .note {
-    grid-column: 1;
+  .head {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .list {
+    gap: clamp(3.5rem, 12vh, 6rem);
+  }
+  .rail {
+    left: calc(var(--axis) / 2);
+  }
+  .item,
+  .item[data-side='right'],
+  .item[data-side='left'] {
+    grid-template-columns: var(--axis) minmax(0, 1fr);
+    grid-template-areas:
+      'axis photo'
+      'axis card';
+    row-gap: 1.1rem;
+    align-items: start;
+  }
+  .item[data-side='left'] .card {
+    justify-self: stretch;
+    text-align: left;
+  }
+  .item[data-side='left'] .cardTop,
+  .item[data-side='left'] .org {
+    flex-direction: row;
+  }
+  .item[data-side='left'] .note {
+    margin-left: 0;
+  }
+  .item[data-side='left'] .tags {
+    justify-content: flex-start;
+  }
+  .card {
+    max-width: none;
+  }
+  /* ring next to the card, not between photo and card */
+  .axis {
+    grid-row: 1 / span 2;
+  }
+  .item[data-side='right'] .photo,
+  .item[data-side='left'] .photo {
+    justify-self: stretch;
+    width: auto;
+    margin: 0 0.7rem 0.7rem 0;
+  }
+  .photoFrame {
+    aspect-ratio: 16 / 10;
+  }
+  .item[data-side='right'] .photoBlock,
+  .photoBlock {
+    transform: translate(0.6rem, 0.6rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .segment,
+  .node,
+  .photoFrame {
+    transition: none;
+  }
+  .liveDot {
+    animation: none;
   }
 }

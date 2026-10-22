@@ -4,6 +4,7 @@ import { gsap, prefersReducedMotion, useGSAP } from '@/lib/animation';
 import { animationConfig } from '@/animations/config';
 import { ease } from '@/animations/easings';
 import { hideImage, imageReveal } from '@/animations/imageAnimations';
+import { characterReveal, hideForReveal } from '@/animations/textAnimations';
 import { motionStore } from '@/lib/motionStore';
 import { mq } from '@/lib/responsive';
 import { cn, longestLine } from '@/lib/utils';
@@ -30,11 +31,15 @@ interface HeroProps {
  * Four depth layers (background 0.15 · midground 0.35 · subject 0.6 · foreground 1)
  * follow the pointer. The first name line sits behind the subject, the second
  * in front of it. On scroll the lines drift apart and the subject settles.
+ * Its entrance runs inside the logo window on page load and ends as the window fills the screen.
  */
 export function Hero({ profile, hero, model }: HeroProps) {
   const root = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLDivElement>(null);
-  const { ready } = usePageTransition();
+  const { ready, introDuration } = usePageTransition();
+  // read when the intro starts (not a dependency: a later change must not restart it)
+  const introLength = useRef(introDuration);
+  introLength.current = introDuration;
   const { depth, pointer } = animationConfig;
   const chars = longestLine(hero.titleLines);
   // Both name lines share one size, measured so the longest line always fits the screen.
@@ -102,18 +107,31 @@ export function Hero({ profile, hero, model }: HeroProps) {
     { scope: root },
   );
 
-  // Intro: one orchestrated moment when the curtain opens.
+  // Intro: one quick timeline when the page is revealed. On page load it starts as soon as the logo
+  // window opens and is squeezed to end as the window fills the screen (maskZoom in
+  // src/config/pageTransition.ts); after a page sweep it takes `introAfterSweep`.
   useGSAP(
     () => {
-      if (!frame.current || prefersReducedMotion()) return;
-      const fades = root.current?.querySelectorAll('[data-hero-intro]') ?? [];
+      const el = root.current;
+      const f = frame.current;
+      if (!el || !f || prefersReducedMotion()) return;
+      const q = gsap.utils.selector(el);
+      const fades = q('[data-hero-intro]');
+      const back = q('[data-title-back] [data-char]');
+      const front = q('[data-title-front] [data-char]');
       if (!ready) {
-        hideImage(frame.current, 'up');
+        hideImage(f, 'up');
+        hideForReveal([...back, ...front]);
         gsap.set(fades, { autoAlpha: 0, y: 24 });
         return;
       }
-      imageReveal(frame.current, frame.current.querySelector('[data-subject-media]'), { delay: 0.15 });
-      gsap.to(fades, { autoAlpha: 1, y: 0, duration: 1, ease: ease.out, stagger: 0.08, delay: 0.7 });
+      const tl = gsap.timeline();
+      tl.add(imageReveal(f, f.querySelector('[data-subject-media]')), 0)
+        .add(characterReveal(back), 0.08)
+        .add(characterReveal(front), 0.2)
+        .fromTo(fades, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: ease.out, stagger: 0.06 }, 0.4);
+      // natural length ≈ 1.7 s → played faster so it lasts exactly `introDuration`
+      tl.timeScale(tl.duration() / Math.max(0.3, introLength.current));
     },
     { scope: root, dependencies: [ready], revertOnUpdate: true },
   );
@@ -141,7 +159,7 @@ export function Hero({ profile, hero, model }: HeroProps) {
 
         <div className={cn(styles.layer, styles.mid)} data-depth={depth.midground}>
           <div data-title-back data-title-line className={cn(styles.title, styles.titleBack)}>
-            <TextReveal as="span" text={hero.titleLines[0]} mode="chars" trigger="load" delay={0.2} />
+            <TextReveal as="span" text={hero.titleLines[0]} mode="chars" trigger="none" />
           </div>
           {hero.showObject && hero.mode === 'cutout' ? (
             <div className={styles.object} data-object>
@@ -172,7 +190,7 @@ export function Hero({ profile, hero, model }: HeroProps) {
 
         <div className={cn(styles.layer, styles.fg)} data-depth={depth.foreground}>
           <div data-title-front data-title-line className={cn(styles.title, styles.titleFront)}>
-            <TextReveal as="span" text={hero.titleLines[1]} mode="chars" trigger="load" delay={0.38} />
+            <TextReveal as="span" text={hero.titleLines[1]} mode="chars" trigger="none" />
           </div>
         </div>
 

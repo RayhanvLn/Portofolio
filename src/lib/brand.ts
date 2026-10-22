@@ -11,3 +11,6 @@ export const brandLogo: BrandLogo = portfolio.profile.logo ?? {
   aspectRatio: 982.7 / 716.7,
   alt: `${portfolio.profile.name} logo`,
 };
+
+/** Name shown on the load screen label (src/config/pageTransition.ts → loadLabel). */
+export const brandName: string = portfolio.profile.name;

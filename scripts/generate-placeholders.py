@@ -143,6 +143,8 @@ if __name__ == '__main__':
         frame(f'images/projects/project-0{n}/detail-02.webp', (1200, 800), f'P0{n} detail 2', '2400×1600', seed=n * 2.3)
     for n in range(1, 5):
         frame(f'images/lifestyle/lifestyle-0{n}.webp', (1200, 800), f'Lifestyle 0{n}', '2400×1600', light=(n == 2), seed=n * .9 + 5)
+    for n in range(1, 7):
+        frame(f'images/experience/experience-0{n}.webp', (960, 1200), f'Experience 0{n}', '1600×2000', light=(n % 3 == 2), seed=n * 1.3 + 9)
     obj('transparent/objects/object-01.webp', 'ring')
     obj('transparent/objects/object-02.webp', 'cube')
     obj('transparent/objects/object-03.webp', 'sphere')

@@ -87,3 +87,100 @@
     opacity: 1;
   }
 }
+
+/* ── Page load: the logo turns into a window onto the page ─────────────
+   Two mask layers: the logo and a full rectangle. "exclude" (xor) keeps
+   everything except the logo, so the logo becomes a hole. The engine
+   (revealThroughLogo) sets mask-size / mask-position every frame. */
+.panel[data-hole='open'] {
+  -webkit-mask-image: var(--hole-src), linear-gradient(#000, #000);
+  mask-image: var(--hole-src), linear-gradient(#000, #000);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  will-change: transform, mask-size;
+}
+
+/* Small line of text at the bottom of the load screen (config: loadLabel). */
+.label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: center;
+  gap: 0.6em;
+  padding: 0 1rem;
+  color: var(--transition-ink, #111112);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+}
+.labelDot {
+  width: 0.5em;
+  height: 0.5em;
+  align-self: center;
+  border-radius: 50%;
+  background: currentColor;
+}
+/* only on page load, never during navigations */
+.overlay[data-load='true'][data-state='covering'] .label {
+  animation: labelIn 420ms ease-out var(--intro-delay, 80ms) both;
+}
+.overlay[data-load='true'][data-state='covering'] .labelDot {
+  animation: labelPulse 900ms ease-in-out infinite alternate;
+}
+.overlay[data-load='true'][data-state='active'] .label {
+  opacity: 1;
+}
+.overlay:not([data-load='true']) .label {
+  display: none;
+}
+@keyframes labelIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes labelPulse {
+  to {
+    opacity: 0.25;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .overlay[data-load='true'][data-state='covering'] .label {
+    animation: none;
+    opacity: 1;
+  }
+  .overlay[data-load='true'][data-state='covering'] .labelDot {
+    animation: none;
+  }
+}
+
+/* ── Navigation: the accent-coloured logo that grows from the click ─────
+   A full-screen layer in the transition colour, masked to the logo shape.
+   coverWithLogo() resizes / moves the mask every frame until it covers all. */
+.grow {
+  position: absolute;
+  inset: 0;
+  display: none;
+  background: var(--transition-bg);
+  -webkit-mask-image: var(--hole-src);
+  mask-image: var(--hole-src);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  pointer-events: none;
+}
+.grow[data-on='true'] {
+  display: block;
+}

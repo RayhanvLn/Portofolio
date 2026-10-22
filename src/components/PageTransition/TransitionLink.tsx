@@ -30,7 +30,13 @@ export function TransitionLink({ href, transitionLabel, onClick, children, ...re
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     if (rest.target === '_blank') return;
     e.preventDefault();
-    navigate(href, transitionLabel);
+    // click point (keyboard: none) and whether the click was inside the menu (data-transition-solid)
+    const pointer = e.detail > 0;
+    navigate(href, transitionLabel, {
+      x: pointer ? e.clientX : undefined,
+      y: pointer ? e.clientY : undefined,
+      solid: Boolean(e.currentTarget.closest('[data-transition-solid]')),
+    });
   };
 
   return (

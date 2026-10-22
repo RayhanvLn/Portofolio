@@ -85,6 +85,16 @@
   letter-spacing: -0.01em;
   color: var(--c-accent);
 }
+/* Japanese greeting (こんにちは): Noto Sans JP, light, to match the narrow orange Latin words */
+.greetWord[data-script='jp'] {
+  font-family: var(--font-jp), var(--font-sans);
+  font-weight: 300;
+  font-stretch: normal;
+  font-variation-settings: normal;
+  letter-spacing: 0.02em;
+  /* kana sit a little larger in their em box than Latin capitals */
+  font-size: 0.86em;
+}
 /* without JavaScript (or with reduced motion) only the first greeting shows */
 .greetWord:not(:first-child) {
   visibility: hidden;

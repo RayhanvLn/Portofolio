@@ -13,10 +13,10 @@
   --toggle-bg: var(--c-dark);
   --toggle-fg: var(--c-paper);
 }
-/* menu open: black button with an orange X, sitting on the orange menu */
+/* menu open: orange button with a black X, sitting on the dark menu */
 .header[data-open='true'] {
-  --toggle-bg: var(--c-dark);
-  --toggle-fg: var(--c-accent);
+  --toggle-bg: var(--c-accent);
+  --toggle-fg: var(--c-dark);
 }
 
 .toggle {
@@ -49,7 +49,7 @@
   }
 }
 .header[data-open='true'] .toggle:focus-visible {
-  outline-color: var(--c-dark);
+  outline-color: var(--c-paper);
 }
 .toggle:active {
   transform: scale(0.94);
@@ -101,18 +101,19 @@
 }
 
 /* ── Full-screen menu ──────────────────────────────────────────────────
-   Orange & black: McLaren-orange stage with black type, and the footer row on
-   a black band along the bottom. Colours of the menu, in one place:
+   Dark stage with light type and orange accents — the opposite of the orange page
+   transition, so the growing orange logo stands out when a link is clicked.
+   Footer row on a slightly lighter band along the bottom. Colours of the menu, in one place:
      --menu-bg      stage            --menu-ink    links, texture
      --menu-band    footer band      --menu-hover  letters on hover
      --menu-current current page (dimmed ink) + --menu-mark (its hand-drawn line) */
 .menu {
-  --menu-bg: var(--c-accent);
-  --menu-ink: var(--c-dark);
-  --menu-band: var(--c-dark);
-  --menu-hover: var(--c-paper);
-  --menu-current: rgba(17, 17, 18, 0.42);
-  --menu-mark: var(--c-paper);
+  --menu-bg: var(--c-dark);
+  --menu-ink: var(--c-paper);
+  --menu-band: #1b1b1d;
+  --menu-hover: var(--c-accent);
+  --menu-current: rgba(241, 240, 233, 0.36);
+  --menu-mark: var(--c-accent);
   position: fixed;
   inset: 0;
   z-index: 99;
@@ -133,7 +134,7 @@
   background: var(--menu-ink);
   -webkit-mask: var(--svg-contour-2) 30% 50% / cover no-repeat;
   mask: var(--svg-contour-2) 30% 50% / cover no-repeat;
-  opacity: 0.12;
+  opacity: 0.07;
   pointer-events: none;
 }
 
@@ -214,7 +215,7 @@
   transition-delay: 0.7s;
 }
 
-/* Footer row: status, email, socials — on the black band, edge to edge */
+/* Footer row: status, email, socials — on the band, edge to edge */
 .menuFoot {
   position: relative;
   display: flex;
@@ -225,6 +226,7 @@
   margin: 0 calc(-1 * var(--gutter)) calc(-1 * var(--gutter));
   padding: 1.25rem var(--gutter) calc(var(--gutter) + env(safe-area-inset-bottom, 0px));
   background: var(--menu-band);
+  border-top: 1px solid rgba(241, 240, 233, 0.08);
   font-size: 0.9375rem;
   color: rgba(241, 240, 233, 0.75);
 }
@@ -239,7 +241,7 @@
 }
 @media (hover: hover) {
   .footLinks a:hover {
-    color: var(--c-paper);
+    color: var(--c-accent);
     background-size: 100% 1px;
   }
 }

@@ -3,7 +3,8 @@ import { pageTransitionConfig as cfg } from '@/config/pageTransition';
 import styles from './TransitionOverlay.module.css';
 
 /**
- * Markup of the full-screen transition: a solid panel with the logo centred.
+ * Markup of the full-screen transition: a solid panel with the logo centred
+ * (plus a small label on page load).
  * Server-rendered in its covering state so the first paint never shows
  * un-animated content. Animated by src/lib/pageTransitionEngine.ts.
  */
@@ -21,11 +22,13 @@ export function TransitionOverlay({ overlayRef }: { overlayRef: RefObject<HTMLDi
     '--intro-repeat-duration': `${cfg.introAnimation.repeatLogoIn}ms`,
     '--intro-blur': `${cfg.introAnimation.blur}px`,
     '--intro-ease': cfg.logoEasing,
+    '--transition-ink': cfg.loadLabel.color,
+    '--hole-src': `url("${logo.src}")`,
   } as CSSProperties;
   const w = logo.width.desktop;
 
   return (
-    <div ref={overlayRef} className={`${styles.overlay} page-transition`} data-state="covering" aria-hidden="true" style={vars}>
+    <div ref={overlayRef} className={`${styles.overlay} page-transition`} data-state="covering" data-load="true" aria-hidden="true" style={vars}>
       <div className={styles.panel} data-transition-panel>
         <span className={styles.logoWrap}>
           {/* eslint-disable-next-line @next/next/no-img-element -- plain SVG file: stays sharp at any size, swappable in /public */}
@@ -40,7 +43,15 @@ export function TransitionOverlay({ overlayRef }: { overlayRef: RefObject<HTMLDi
             draggable={false}
           />
         </span>
+        {cfg.loadLabel.text ? (
+          <span className={styles.label} data-transition-label>
+            <span className={styles.labelDot} />
+            {cfg.loadLabel.text}
+          </span>
+        ) : null}
       </div>
+      {/* navigation: the accent logo that grows from the click (see coverWithLogo) */}
+      <div className={styles.grow} data-transition-grow />
     </div>
   );
 }

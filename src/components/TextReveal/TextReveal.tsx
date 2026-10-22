@@ -13,8 +13,8 @@ interface TextRevealProps {
   text: string | string[];
   as?: 'h1' | 'h2' | 'h3' | 'p' | 'span' | 'div';
   mode?: Mode;
-  /** 'load' = plays when the page becomes ready; 'scroll' = when it enters the viewport. */
-  trigger?: 'load' | 'scroll';
+  /** 'load' = plays when the page becomes ready; 'scroll' = when it enters the viewport; 'none' = static, no animation. */
+  trigger?: 'load' | 'scroll' | 'none';
   delay?: number;
   stagger?: number;
   start?: string;
@@ -49,7 +49,7 @@ export function TextReveal({
   useGSAP(
     () => {
       const el = ref.current;
-      if (!el) return;
+      if (!el || trigger === 'none') return;
       const selector = mode === 'chars' ? '[data-char]' : mode === 'words' ? '[data-word]' : '[data-line-inner]';
       const targets = el.querySelectorAll<HTMLElement>(selector);
 

@@ -8,11 +8,15 @@ import { pageTransitionConfig as cfg } from '@/config/pageTransition';
 import {
   awaitLoadLogo,
   coverPage,
+  coverWithLogo,
+  type CoverOrigin,
   getParts,
   instantCover,
   pageContent,
   resetOverlay,
   revealPage,
+  revealThroughLogo,
+  supportsLogoWindow,
   waitForVisibleImages,
 } from '@/lib/pageTransitionEngine';
 import { useSmoothScroll } from '@/hooks/useSmoothScroll';
@@ -20,6 +24,18 @@ import { PageTransitionContext, type PageTransitionApi } from '@/hooks/usePageTr
 import { TransitionOverlay } from './TransitionOverlay';
 
 const SESSION_KEY = 'pf:intro';
+
+/**
+ * layout.tsx turns the browser's scroll memory off before the first paint so a refresh opens on the hero.
+ * Once the page is shown it is switched back on, so Back/Forward keep their usual behaviour.
+ */
+const restoreScrollMemory = () => {
+  try {
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'auto';
+  } catch {
+    /* not supported — nothing to restore */
+  }
+};
 
 function labelForPath(path: string) {
   if (path === '/') return 'Home';
@@ -37,6 +53,8 @@ interface RevealArgs {
   shift?: boolean;
   holdMs?: number;
   focus?: boolean;
+  /** Page load only: open the page through the logo (zoom length in ms). */
+  windowMs?: number;
 }
 
 /**
@@ -56,6 +74,7 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
   const liveRef = useRef<HTMLSpanElement>(null);
   const [ready, setReady] = useState(false);
   const [isTransitioning, setTransitioning] = useState(false);
+  const [introDuration, setIntroDuration] = useState<number>(cfg.introAfterSweep);
 
   const busy = useRef(false);
   const introDone = useRef(false);
@@ -77,7 +96,15 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
 
   /** 4–6: wait for the logo + first-screen images, hold, reveal. Always unlocks, even on error. */
   const reveal = useCallback(
-    async ({ hash = '', withLogo = true, shift = true, holdMs = cfg.durations.logoHold, focus = true }: RevealArgs = {}) => {
+    async ({
+      hash = '',
+      withLogo = true,
+      shift = true,
+      holdMs = cfg.durations.logoHold,
+      focus = true,
+      // navigations open the new page through the logo too (unless navigation is 'sweep')
+      windowMs = cfg.navigation === 'logoZoom' ? cfg.logoCover.revealDuration : 0,
+    }: RevealArgs = {}) => {
       const overlay = overlayRef.current;
       const reduced = prefersReducedMotion();
       try {
@@ -85,6 +112,20 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
         if (hash) scrollTo(hash, { immediate: true });
         refreshScroll();
         await Promise.all([shown.current, waitForVisibleImages(document.getElementById('main'), cfg.imageWaitMs)]);
+        if (overlay && windowMs && !reduced && supportsLogoWindow()) {
+          // the logo becomes a window and zooms open; entrances start at maskZoom.readyAt and are
+          // squeezed so they end as the window fills the screen
+          setIntroDuration((windowMs * cfg.maskZoom.heroIntro) / 1000);
+          await revealThroughLogo(getParts(overlay), pageContent(), { duration: windowMs, holdMs, onOpen: () => setReady(true) });
+          // The page was scaled (maskZoom.pageScale) while the entrance triggers were created, so every
+          // scroll position was measured too low — the deeper the section, the further off (the footer
+          // of a long page ended up past the end and never revealed; pinned sections jumped). The page
+          // is back to normal size now: measure everything again.
+          refreshScroll();
+          if (focus) document.getElementById('main')?.focus({ preventScroll: true });
+          return;
+        }
+        setIntroDuration(cfg.introAfterSweep);
         setReady(true);
         if (overlay) {
           await revealPage(getParts(overlay), pageContent(), {
@@ -93,6 +134,8 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
             shift,
             holdMs: reduced ? cfg.reducedMotion.hold : holdMs,
           });
+          // the content slid in (contentShift) while triggers were measured: measure again
+          refreshScroll();
         }
         if (focus) document.getElementById('main')?.focus({ preventScroll: true });
       } catch (err) {
@@ -123,24 +166,39 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
           /* private mode: the full intro simply plays again next time */
         }
       }
-      shown.current = awaitLoadLogo(getParts(overlay));
-      void reveal({ withLogo: true, holdMs: first ? cfg.introAnimation.hold : cfg.introAnimation.repeatHold, focus: false });
+      // Refresh: always open at the top (the hero), not where the visitor had scrolled to.
+      // A link with #section still lands on that section.
+      const toTop = () => {
+        if (!window.location.hash) scrollTo(0, { immediate: true });
+      };
+      toTop();
+      // once more just before the reveal, in case the browser restored the old position late
+      shown.current = awaitLoadLogo(getParts(overlay)).then(toTop);
+      const z = cfg.maskZoom;
+      void reveal({
+        withLogo: true,
+        holdMs: first ? cfg.introAnimation.hold : cfg.introAnimation.repeatHold,
+        focus: false,
+        windowMs: cfg.loadReveal === 'maskZoom' ? (first ? z.duration : z.repeatDuration) : 0,
+      }).then(restoreScrollMemory);
     }, 60);
     return () => window.clearTimeout(id);
-  }, [reveal]);
+  }, [reveal, scrollTo]);
 
   /** Used by the optional 'counter' preloader when the visitor presses Enter. */
   const completeIntro = useCallback(async () => {
     if (introDone.current) return;
     introDone.current = true;
     busy.current = true;
+    if (!window.location.hash) scrollTo(0, { immediate: true });
     if (overlayRef.current) shown.current = awaitLoadLogo(getParts(overlayRef.current));
     await reveal({ withLogo: true, holdMs: 0, focus: false });
-  }, [reveal]);
+    restoreScrollMemory();
+  }, [reveal, scrollTo]);
 
   /** 1–3: cover, then route once the screen is fully covered. */
   const navigate = useCallback(
-    async (href: string, label?: string) => {
+    async (href: string, label?: string, from?: CoverOrigin) => {
       const url = new URL(href, window.location.href);
       if (url.origin !== window.location.origin) {
         window.location.href = href;
@@ -158,7 +216,9 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
       announce(`Opening ${label ?? labelForPath(url.pathname)}`);
       router.prefetch(url.pathname);
       try {
-        const run = coverPage(getParts(overlayRef.current), pageContent(), { reduced: prefersReducedMotion() });
+        const parts = getParts(overlayRef.current);
+        const opts = { reduced: prefersReducedMotion() };
+        const run = cfg.navigation === 'logoZoom' ? coverWithLogo(parts, pageContent(), { ...opts, from }) : coverPage(parts, pageContent(), opts);
         shown.current = run.shown;
         await run.covered;
         setReady(false);
@@ -233,8 +293,8 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
   }, [ready]);
 
   const api = useMemo<PageTransitionApi>(
-    () => ({ navigate: (h, l) => void navigate(h, l), ready, isTransitioning, completeIntro }),
-    [navigate, ready, isTransitioning, completeIntro],
+    () => ({ navigate: (h, l, f) => void navigate(h, l, f), ready, isTransitioning, introDuration, completeIntro }),
+    [navigate, ready, isTransitioning, introDuration, completeIntro],
   );
 
   return (

@@ -1,128 +1,336 @@
+/* ── Skills, "hall of fame" style: staggered grid of notched tool cards (Skills.tsx) ── */
 .skills {
   position: relative;
-  padding: clamp(6rem, 14vh, 10rem) var(--gutter);
+  overflow: clip;
+  padding: clamp(6rem, 14vh, 10rem) var(--gutter) clamp(7rem, 16vh, 11rem);
+  /* card colours follow the scene; accent on hover */
+  --card-line: color-mix(in srgb, var(--fg) 24%, transparent);
+  --card-fill: color-mix(in srgb, var(--fg) 3%, transparent);
 }
+
+/* ── Heading: plain line(s) + accent line, intro on the right ───── */
 .head {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--gutter);
-  margin-bottom: clamp(3rem, 8vh, 6rem);
+  align-items: end;
+  margin-bottom: clamp(3rem, 9vh, 6rem);
 }
 .title {
-  grid-column: 1 / span 8;
+  grid-column: 1 / span 7;
+  font-size: clamp(3rem, 7vw, 8rem);
+  line-height: 0.86;
+  text-transform: uppercase;
+}
+.titlePlain {
+  display: block;
   font-weight: 850;
   font-stretch: 125%;
   font-variation-settings: 'wdth' 125;
-  text-transform: uppercase;
   letter-spacing: -0.05em;
-  line-height: 0.84;
-  font-size: clamp(3rem, 7vw, 8rem);
+}
+/* the site's accent voice: narrow, light, orange */
+.titleAccent {
+  display: block;
+  font-weight: 300;
+  font-stretch: 62%;
+  font-variation-settings: 'wdth' 62;
+  letter-spacing: -0.01em;
+  color: var(--c-accent);
+}
+.intro {
+  grid-column: 9 / span 4;
+  max-width: 34ch;
+  font-size: clamp(1rem, 1.15vw, 1.15rem);
+  line-height: 1.5;
+  color: var(--muted);
 }
 
-.list {
-  position: relative;
-  padding-left: clamp(1.5rem, 3vw, 3rem);
+/* ── Grid: columns, every other one starts lower ─────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: clamp(0.75rem, 1.4vw, 1.5rem);
+  align-items: start;
 }
-.rail {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: var(--line);
+/* phones layout (shown below 900px) */
+.stack {
+  display: none;
 }
-.railFill {
-  position: absolute;
-  inset: 0;
-  background: var(--fg);
-  transform: scaleY(0);
-  transform-origin: 50% 0%;
-}
-.indicator {
-  position: absolute;
-  left: -0.35rem;
-  top: 0;
-  width: 0.75rem;
-  height: 0.75rem;
-  background: var(--c-accent);
-  box-shadow: 0 0 0 1px var(--fg);
+.col {
+  display: grid;
+  gap: clamp(0.75rem, 1.4vw, 1.5rem);
   will-change: transform;
 }
-
-.row {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: var(--gutter);
-  align-items: baseline;
-  padding: clamp(1.5rem, 4vh, 2.75rem) 0;
+.col[data-col-offset='true'] {
+  padding-top: clamp(4rem, 9vw, 9rem);
 }
-.rule {
+
+/* column heading: number, category, count — sits on a rule above its cards */
+.colHead {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0 0 0.85rem;
+  margin-bottom: 0.35rem;
+  border-bottom: 1px solid var(--card-line);
+}
+.colIndex {
+  font-weight: 300;
+  font-stretch: 62%;
+  font-variation-settings: 'wdth' 62;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--c-accent);
+}
+.colTitle {
+  min-width: 0;
+  font-size: clamp(0.8125rem, 0.95vw, 0.95rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.colCount {
+  display: grid;
+  place-items: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Card ────────────────────────────────────────────────────────── */
+.card {
+  --notch-h: 2.6rem;
+  /* Outline shape (read by Skills.tsx): corner radius and the longest run of the diagonal step. */
+  --notch-radius: 16px;
+  --notch-diag: 42px;
+  /* Room the outline needs left of the notch; the caption is never wider than the card minus this,
+     so it always fits inside the notch (long names wrap instead of running into the outline). */
+  --cap-room: calc(var(--notch-radius) * 2 + var(--notch-diag) + 4px);
+  position: relative;
+  margin: 0;
+  aspect-ratio: 1 / 1.02;
+  cursor: default;
+}
+.frame {
   position: absolute;
-  left: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.frame path {
+  fill: var(--card-fill);
+  stroke: var(--card-line);
+  stroke-width: 1;
+  transition:
+    stroke 0.45s var(--ease-out),
+    fill 0.45s var(--ease-out);
+}
+
+/* default face: category (small, top-left) + the tool's badge / logo, big, in the middle */
+.face {
+  position: absolute;
+  inset: 0 0 var(--cap-h, var(--notch-h)) 0;
+  display: grid;
+  place-items: center;
+  padding: 1.1rem;
+}
+.badge {
+  display: grid;
+  place-items: center;
+  width: clamp(4.25rem, 7vw, 6.5rem);
+  aspect-ratio: 1;
+  border-radius: 28%;
+  background: var(--badge, var(--c-accent));
+  color: var(--badge-ink, #f1f0e9);
+  font-weight: 850;
+  font-stretch: 115%;
+  font-variation-settings: 'wdth' 115;
+  font-size: clamp(1.4rem, 2.3vw, 2.15rem);
+  letter-spacing: -0.03em;
+  box-shadow: 0 18px 30px -18px rgba(0, 0, 0, 0.55);
+  transform: rotate(-6deg);
+  transition: transform 0.7s cubic-bezier(0.34, 1.6, 0.64, 1);
+}
+.logo {
+  width: clamp(4.25rem, 7vw, 6.5rem);
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.35));
+  transition: transform 0.7s cubic-bezier(0.34, 1.6, 0.64, 1);
+}
+
+/* hover panel: wipes up inside the frame (above the notch) */
+.reveal {
+  position: absolute;
+  inset: 0.35rem 0.35rem calc(var(--cap-h, var(--notch-h)) + 0.35rem);
+  border-radius: 0.8rem;
+  overflow: hidden;
+  background: var(--c-accent);
+  color: #111112;
+  clip-path: inset(100% 0% 0% 0%);
+  transition: clip-path 0.7s var(--ease-out);
+}
+.revealInner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  padding: 1rem;
+}
+.revealCat {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.revealName {
+  font-weight: 850;
+  font-stretch: 118%;
+  font-variation-settings: 'wdth' 118;
+  font-size: clamp(1.2rem, 1.8vw, 1.75rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.revealDesc {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* caption in the notch: name + accent category */
+.caption {
+  position: absolute;
   right: 0;
   bottom: 0;
-  height: 1px;
-  background: var(--line);
-  transform: scaleX(0);
-  transform-origin: 0% 50%;
+  max-width: calc(100% - var(--cap-room));
+  min-height: var(--notch-h);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 0.55rem 0 0.7rem 0.85rem;
+  font-size: clamp(0.8125rem, 0.95vw, 0.95rem);
+  font-weight: 650;
+  line-height: 1.15;
+  text-align: right;
 }
-.num {
-  grid-column: 1 / span 2;
-  font-weight: 850;
-  font-stretch: 125%;
-  font-variation-settings: 'wdth' 125;
-  letter-spacing: -0.05em;
-  line-height: 0.8;
-  font-size: clamp(3rem, 7vw, 8rem);
-  font-variant-numeric: tabular-nums;
-  color: transparent;
-  -webkit-text-stroke: 1px var(--muted);
-  transition: color 0.6s var(--ease-out), -webkit-text-stroke-color 0.6s;
+/* name + number flow as text: if they don't fit on one line, they wrap between words
+   (the number moves to the next line) — words are never cut in the middle */
+.captionText {
+  display: block;
+  hyphens: manual;
+  overflow-wrap: normal;
+  word-break: normal;
+  text-wrap: balance;
 }
-.row[data-active='true'] .num {
-  color: var(--fg);
-  -webkit-text-stroke-color: var(--fg);
+.captionName {
+  display: inline;
 }
-.name {
-  grid-column: 3 / span 5;
-  font-weight: 800;
-  font-stretch: 125%;
-  font-variation-settings: 'wdth' 125;
-  text-transform: uppercase;
-  letter-spacing: -0.04em;
-  line-height: 0.92;
-  font-size: clamp(1.6rem, 3vw, 3.25rem);
-}
-.body {
-  grid-column: 8 / span 5;
-  display: grid;
-  gap: 0.75rem;
-  font-size: 1rem;
-  line-height: 1.45;
-  max-width: 42ch;
-}
-.labels {
-  color: var(--muted);
-  font-size: 0.875rem;
+.captionCat {
+  display: inline-block;
+  margin-left: 0.5em;
+  white-space: nowrap;
+  color: var(--c-accent);
+  font-weight: 750;
 }
 
+/* ── Active (hover on desktop, tap on touch) ─────────────────────── */
+.card[data-open='true'] .frame path {
+  stroke: var(--c-accent);
+}
+.card[data-open='true'] .reveal {
+  clip-path: inset(0% 0% 0% 0%);
+}
+.card[data-open='true'] .badge,
+.card[data-open='true'] .logo {
+  transform: rotate(0deg) scale(1.08);
+}
+@media (hover: hover) and (pointer: fine) {
+  .card:hover .frame path {
+    stroke: var(--c-accent);
+  }
+  .card:hover .reveal {
+    clip-path: inset(0% 0% 0% 0%);
+  }
+  .card:hover .badge,
+  .card:hover .logo {
+    transform: rotate(0deg) scale(1.08);
+  }
+}
+
+/* ── Tablet & phone ──────────────────────────────────────────────── */
 @media (max-width: 899px) {
-  .head,
-  .row {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+  .head {
+    grid-template-columns: 1fr;
+    row-gap: 1.25rem;
   }
-  .title {
-    grid-column: 1 / -1;
+  .title,
+  .intro {
+    grid-column: 1;
   }
-  .num {
-    grid-column: 1 / span 2;
+  .grid[data-grid='desktop'] {
+    display: none;
   }
-  .name {
-    grid-column: 3 / -1;
+  .stack {
+    display: grid;
+    gap: 3.5rem;
   }
-  .body {
-    grid-column: 3 / -1;
-    margin-top: 0.75rem;
+  .block .colHead {
+    margin-bottom: 1rem;
+  }
+  .col[data-col-offset='true'] {
+    padding-top: 3.5rem;
+  }
+  .card {
+    --notch-h: 2.3rem;
+    /* small cards: tighter corners and a shorter diagonal leave more width for the name */
+    --notch-radius: 12px;
+    --notch-diag: 22px;
+  }
+  .caption {
+    padding: 0.45rem 0 0.6rem 0.4rem;
+    font-size: 0.71875rem;
+    line-height: 1.18;
+  }
+  /* two-line plate: the number on top, the name below (wrapping between words if it must) */
+  .captionText {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
+  }
+  .captionCat {
+    order: -1;
+    margin-left: 0;
+    font-size: 0.625rem;
+    letter-spacing: 0.06em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .badge,
+  .logo,
+  .frame path {
+    transition: none;
   }
 }

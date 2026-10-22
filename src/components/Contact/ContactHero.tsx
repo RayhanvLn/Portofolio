@@ -17,6 +17,9 @@ import { Arrow } from '@/components/Icons/Arrow';
 import { LocalTime } from './LocalTime';
 import styles from './Contact.module.css';
 
+/** Hiragana, katakana or kanji → shown in the Japanese font. */
+const isJapanese = (word: string) => /[\u3040-\u30ff\u31f0-\u31ff\u4e00-\u9fff]/.test(word);
+
 const chars = (word: string) =>
   Array.from(word).map((c, i) => (
     <span key={i} className={styles.char} data-char>
@@ -108,7 +111,14 @@ export function ContactHero({ profile, socials }: { contact?: ContactContent; pr
             <FitText className={styles.rotator}>
               <span className={styles.stack}>
                 {greetings.map((g, i) => (
-                  <span key={g + i} className={styles.greetWord} data-greet data-text-line>
+                  <span
+                    key={g + i}
+                    className={styles.greetWord}
+                    data-greet
+                    data-text-line
+                    data-script={isJapanese(g) ? 'jp' : undefined}
+                    lang={isJapanese(g) ? 'ja' : undefined}
+                  >
                     <span className={styles.mask}>{chars(g)}</span>
                   </span>
                 ))}

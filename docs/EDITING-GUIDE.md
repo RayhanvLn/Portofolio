@@ -32,6 +32,9 @@ Page `<title>` and description: `seo` at the top of the same object.
   normal full-bleed photo instead (see `profile.heroBackdrop`).
 - `intro`, `cta`, `secondaryCta`, `scrollLabel` — the copy along the bottom.
 - `showObject` — show/hide the 3D object (cut-out mode only).
+- Hero entrance (photo wipe, name letters, copy): one quick timeline. On page load it starts the moment the logo
+  window appears and ends as the window fills the screen (`maskZoom.heroIntro` in `src/config/pageTransition.ts`);
+  after navigating from another page it lasts `introAfterSweep` seconds.
 
 ## 3. Hero logo
 The logo sits centred at the top of the home hero, above the first name line, aligned with the menu toggle. It is
@@ -126,9 +129,31 @@ Content: **`src/data/academic.ts`** — `titleLines` (wrap words in `*asterisks*
 `text` (words, one entry per line). `highlight: true` draws the accent circle around that value.
 Look: `src/components/AcademicCareer/AcademicCareer.module.css`.
 
-## 7. Lifestyle / collage images
-`lifestyle` array in `portfolio.ts` (also used as `collage.items`). Four 2400 × 1600 images.
-`color: true` keeps one image in colour; the rest are grayscale. Collage heading: `collage.titleLines`.
+## 6b. Skills ("hall of fame" grid)
+Tools: `skills` in `portfolio.ts` — each entry is a category (`title`) and gets its own column on desktop (its own block
+on phones), in the order of the list; its `labels` are the tools (one card each, with a lettered badge, numbered 01, 02… in the notch); `description` shows on the orange panel when you hover a tool. For real logos and/or a
+hover photo, give a category `tools: [{ name: 'React', icon: '/images/skills/react.svg', photo: '/images/skills/react-photo.webp' }, …]`
+(files in `public/images/skills/`). Paragraph beside the title: `intro` in **`src/data/skillsSection.ts`**.
+Section title: the `title` prop in `src/app/page.tsx` / `src/app/about/page.tsx` — the last line gets the orange accent style.
+Look: `Skills.module.css` (columns, offset, card size, hover panel).
+
+## 6c. Experience (About page)
+Roles: `experience` in `portfolio.ts` (`period`, `role`, `organisation`, `note`). A period containing "Now" gets a pulsing
+"Current" badge; the "2024 — Now" range and the (03) count are worked out from the roles.
+Photos: one per role, in order — overwrite `public/images/experience/experience-01.webp`, `-02`, `-03`… (portrait 4:5,
+recommended 1600 × 2000). Or give a role its own `image: { src, alt, width, height }`.
+Colour per role: warm tones in order (`TONES` at the top of `src/components/Experience/Experience.tsx`), or `tone: '#hex'` on a role.
+Look: `Experience.module.css` (photo size `.sticky` width, timeline, cards on phones).
+
+## 7. Lifestyle images — "Off screen" on the About page
+Photos: `lifestyle` array in `portfolio.ts` (also used as `collage.items`). Each photo is one card in the fan;
+add or remove entries freely (5–9 cards look best). Cards are portrait 2:3, so portrait photos work best
+(e.g. 1080 × 1620); for a landscape photo set `focus: '50% 30%'` (horizontal %, vertical %) to choose what stays in view.
+`caption` + `meta` appear on a card when it is lifted (hover / tap). `color: true` keeps a card in colour;
+the others are grayscale until lifted.
+Title and the small "after hours" tag (`sticker`, '' hides it): **`src/data/offScreen.ts`**. Cards only lift once the fan has finished opening.
+Look and motion: `src/components/LifestyleStrip/` — card size `--card-w` in the `.module.css`; fan shape
+(spread, tilt, arc, lift) in `fanPose()` in `LifestyleStrip.tsx`.
 
 ## 8. Other copy
 | What | Where in `portfolio` |
@@ -145,9 +170,15 @@ Look: `src/components/AcademicCareer/AcademicCareer.module.css`.
 ## 8b. Contact page (/contact)
 Content: **`src/data/contactPage.ts`** — `label`, `lead` ("Say"), `greetings` (the words that take turns after it;
 by default the languages you speak), `greetingHold` (seconds per greeting) and `channelsLabel` ("Find me on").
+Greetings in Japanese (hiragana / katakana / kanji, e.g. `'こんにちは'`) switch automatically to the Japanese font
+(Noto Sans JP, loaded in `src/app/layout.tsx`); its look: `.greetWord[data-script='jp']` in `Contact.module.css`.
 Location, live clock (`profile.timezone`, e.g. `'Asia/Jakarta'`), availability and the channel rows (`socials`) come from `portfolio.ts`.
 Browser-tab title: `src/app/contact/page.tsx`.
 Look: `src/components/Contact/Contact.module.css`.
+
+## 8c. Cursor
+The round custom cursor (ring + dot, "View"/"Open" bubbles) is switched with `enabled` in **`src/config/cursor.ts`**
+(false = normal system cursor). Its look: `src/components/CustomCursor/`.
 
 ## 9. Colours
 `src/app/globals.css`, top of the file:
@@ -163,7 +194,7 @@ Look: `src/components/Contact/Contact.module.css`.
 (Home + the `navigation` links from `portfolio.ts`, plus status, email and socials). Button size and distance from
 the edge: `--toggle-size` / `--toggle-offset` in `globals.css` (the home-hero logo lines up with it). Button colours
 switch automatically between light (on dark sections) and dark (on light sections). Menu look:
-`Navigation.module.css` — link size `.menuList font-size` (upper bound; on phones and tablets it is fitted so the longest label fills ~74% of the width — change `fill` in `Navigation.tsx`). Menu colours (orange stage, black type, black footer band) are variables at the top of `.menu`: `--menu-bg`, `--menu-ink`, `--menu-band`, `--menu-hover` (letters on hover), `--menu-current` / `--menu-mark` (current page and its line). Toggle colours while the menu is open: `.header[data-open='true']`.
+`Navigation.module.css` — link size `.menuList font-size` (upper bound; on phones and tablets it is fitted so the longest label fills ~74% of the width — change `fill` in `Navigation.tsx`). Menu colours (dark stage, light type, orange hover and current-page line, slightly lighter footer band — the opposite of the orange page transition) are variables at the top of `.menu`: `--menu-bg`, `--menu-ink`, `--menu-band`, `--menu-hover` (letters on hover), `--menu-current` / `--menu-mark` (current page and its line). Toggle colours while the menu is open: `.header[data-open='true']`.
 
 Which sections are dark or light: the `theme` prop on each `<Scene>` (see `src/app/page.tsx` and the other pages).
 
@@ -248,6 +279,13 @@ Everything is in **`src/config/pageTransition.ts`** (durations in milliseconds):
 | Timing of each step | `durations` (content out, overlay in, logo in, hold, logo out, overlay out, content in) |
 | New content slide distance | `contentShift` (px) |
 | Page-load logo | `introAnimation` — full version on the first visit of a session (`logoIn`, `hold`), shorter on reloads (`repeatLogoIn`, `repeatHold`). Runs in pure CSS from the first paint, so the logo shows even before JavaScript is ready. `intro: 'counter'` brings back the 00→100% preloader |
+| Changing page (navigation) | `navigation`: `'logoZoom'` (default — the orange logo grows from where you clicked until the screen is orange, then the dark logo opens onto the new page like the page load) or `'sweep'` (the earlier panel) |
+| Growing orange logo | `logoCover.duration` (340 ms: tiny dot → full orange, timing measured from the reference), `.origin` (`'center'` like the reference, or `'click'`), `.size` (size multiplier on the measured growth curve), `.logoDelay` (pause on orange before the dark logo), `.menuWait` (clicked in the menu: pause before the orange logo starts, default 0; the menu stays open and closes once the new page is in), `.revealDuration` (zoom that opens the new page) |
+| How the site opens (load / reload) | `loadReveal`: `'maskZoom'` (default — the logo becomes a window onto the page and zooms open) or `'sweep'` (the panel sweeps away like between pages) |
+| Logo-window zoom | `maskZoom.duration` (first visit) / `.repeatDuration` (reloads), `.easing`, `.pageScale` (page settles from this size, `1` = off), `.readyAt` (when the hero entrance starts, `0` = as soon as the window appears), `.heroIntro` (part of the zoom the hero entrance is squeezed into), `.fadeOut` |
+| Point the window opens from | `maskZoom.focus` (0–1 of the logo's width/height) — must be on a **solid** part of the logo; `maskZoom.solidRadius` = half the thickness there (fraction of the logo width) |
+| Page entrance length after a normal page sweep | `introAfterSweep` (seconds) |
+| Text at the bottom of the load screen | `loadLabel.text` (`''` hides it; default = your name + "Portfolio"), `loadLabel.color` |
 | Reduced motion | `reducedMotion` (short cross-fades, no movement) |
 | Safety nets | `imageWaitMs`, `navigationTimeoutMs` |
 
@@ -259,6 +297,24 @@ How it works: markup in `src/components/PageTransition/TransitionOverlay.tsx` (+
 `src/lib/pageTransitionEngine.ts`, orchestration with routing in `src/components/PageTransition/TransitionProvider.tsx`.
 Every internal link that uses `TransitionLink` (navigation, mobile menu, footer, project cards, buttons) runs it.
 The logo shows on every page load; the longer intro plays once per browser session (`sessionStorage` key `pf:intro`), reloads use the shorter timing.
+
+**Refresh always opens at the top (hero):** the browser's scroll memory is switched off in the boot script in
+`src/app/layout.tsx` (also on `pagehide`) and the provider scrolls to the top before the reveal; after the intro it is
+switched back on, so Back/Forward inside the site keep their position. A URL with `#section` still lands on that section.
+
+**Navigation (logoZoom):** `coverWithLogo()` in the engine grows a full-screen layer in the accent colour, masked to
+the logo, from a tiny dot in the centre of the screen until it covers everything (sizes per moment measured from the
+reference video, scaled to the screen width); the panel then
+takes over, the dark logo assembles, and the new page opens through it (`revealThroughLogo()`). Links inside an element
+with `data-transition-solid` (the menu): the menu stays open, the orange logo grows on top of the dark menu
+(after `logoCover.menuWait`, default 0), and the menu closes only after the transition has finished. Back/Forward
+also open through the logo.
+
+**Logo window (page load):** after the logo appears, the panel gets a CSS mask with the logo cut out of it,
+so the logo turns into a window onto the page; the window then grows from `maskZoom.focus` until it fills the
+screen (`revealThroughLogo()` in the engine). Navigations between pages keep the sweep. If you replace the logo,
+pick a new `focus` in its thickest part — otherwise the zoom opens from an empty spot and the screen only clears
+at the very end. Browsers without CSS mask support, and visitors with reduced motion, get the normal reveal.
 
 ## 13. 3D object
 Procedural by default. To use your own: add `public/models/hero-object.glb`, set `model.enabled: true`.
